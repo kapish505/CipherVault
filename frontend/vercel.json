@@ -1,5 +1,5 @@
 {
-    "installCommand": "npm install -g vite && npm install --include=dev --ignore-scripts",
+    "installCommand": "npm install -g npm-run-all && npm install",
     "buildCommand": "npm run build",
     "framework": "vite"
 }
