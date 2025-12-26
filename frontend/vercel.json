@@ -1,5 +1,15 @@
 {
     "installCommand": "npm install -g npm-run-all vite && npm install",
     "buildCommand": "vite build",
-    "framework": "vite"
+    "framework": "vite",
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "/api/$1"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
+    ]
 }

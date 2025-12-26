@@ -37,7 +37,7 @@ export function Dashboard() {
 
     useEffect(() => {
         if (isConnected && address) {
-            handleSync();
+            // handleSync(); // Backend sync disabled for client-side only mode
         }
     }, [isConnected, address]);
 
@@ -48,6 +48,8 @@ export function Dashboard() {
     };
 
     const handleSync = async () => {
+        // Backend sync disabled for client-side only mode
+        /* 
         if (!address) return;
         setIsSyncing(true);
 
@@ -59,6 +61,9 @@ export function Dashboard() {
         } finally {
             setIsSyncing(false);
         }
+        */
+        // Just refresh local list
+        setRefreshTrigger(prev => prev + 1);
     };
 
     const handleFileSelect = (file: metadata.FileMetadata) => {
