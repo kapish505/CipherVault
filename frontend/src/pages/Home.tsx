@@ -10,9 +10,12 @@ import { StorageChoice } from '@/components/home/StorageChoice';
 import { TrustSection } from '@/components/home/TrustSection';
 import { ClosingSection } from '@/components/home/ClosingSection';
 
+import { AnimatedBackground } from '@/components/home/AnimatedBackground';
+
 export function Home() {
     return (
         <div className="home-page">
+            <AnimatedBackground />
             <Hero />
             <UpcomingFeaturesBar />
             <HowItWorks />

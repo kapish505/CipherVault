@@ -16,7 +16,6 @@ import { FileList } from '@/components/dashboard/FileList';
 import { UploadManager } from '@/components/dashboard/UploadManager';
 import { AIAssistantPlaceholder } from '@/components/dashboard/AIAssistantPlaceholder';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
-import { EmptyState } from '@/components/shared/EmptyState';
 // import { syncFiles } from '@/services/sync'; // Disabled
 import * as metadata from '@/services/metadata';
 import { formatFileSize, formatDate } from '@/utils/format';
@@ -40,7 +39,7 @@ export function Dashboard() {
     const [searchQuery, setSearchQuery] = useState('');
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const [isSyncing, setIsSyncing] = useState(false);
+    // const [isSyncing, setIsSyncing] = useState(false);
     const [selectedFile, setSelectedFile] = useState<metadata.FileMetadata | null>(null);
     const [showContextPanel, setShowContextPanel] = useState(false);
 
@@ -221,10 +220,9 @@ export function Dashboard() {
                         <button
                             className="btn-sync"
                             onClick={() => handleSync()}
-                            disabled={isSyncing}
                             title="Refresh"
                         >
-                            {isSyncing ? '⟳' : '🔄'}
+                            🔄
                         </button>
 
                         <div className="view-toggle">
@@ -350,19 +348,22 @@ export function Dashboard() {
 
             {/* Upload Modal */}
             {showUploadModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content">
-                        <div className="modal-header">
+                <div className="upload-modal-overlay">
+                    <div className="upload-modal">
+                        <div className="upload-modal-header">
                             <h2>Upload Files</h2>
                             <button className="modal-close" onClick={() => setShowUploadModal(false)}>✕</button>
                         </div>
-                        <UploadManager
+                        <FileUpload
                             onUploadComplete={handleUploadComplete}
                             currentFolderId={currentFolderId}
                         />
                     </div>
                 </div>
             )}
+
+            {/* Upload Manager - Fixed Bottom Panel */}
+            <UploadManager />
         </div>
     );
 }

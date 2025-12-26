@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 
 interface FileUploadProps {
     onUploadComplete: () => void;
+    currentFolderId?: string | null;
 }
 
 const CLASSIFICATIONS = {
@@ -39,9 +40,9 @@ const CLASSIFICATIONS = {
     }
 };
 
-export function FileUpload({ onUploadComplete }: FileUploadProps) {
+export function FileUpload({ onUploadComplete, currentFolderId }: FileUploadProps) {
     const { address, isConnected } = useWallet();
-    const { addToQueue, processQueue, tasks } = useUploadQueue();
+    const { addToQueue, processQueue } = useUploadQueue();
     const [isDragging, setIsDragging] = useState(false);
     const [classification, setClassification] = useState<'public' | 'private' | 'confidential'>('private');
     const [isUploading, setIsUploading] = useState(false);
@@ -64,7 +65,7 @@ export function FileUpload({ onUploadComplete }: FileUploadProps) {
 
         try {
             // Add files to queue
-            const newTasks = addToQueue(fileArray, undefined, classification);
+            const newTasks = addToQueue(fileArray, currentFolderId || undefined, classification);
 
             // Start processing in background with explicit tasks
             processQueue(address, newTasks).finally(() => {
