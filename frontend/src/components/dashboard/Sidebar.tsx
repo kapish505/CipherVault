@@ -149,7 +149,7 @@ export function Sidebar({
                 <StoragePanel {...storageProps} />
                 <div className="pb-4 text-[9px] text-center text-gray-700 font-mono select-none tracking-widest uppercase opacity-50 flex flex-col gap-1">
                     <span>Prototype Simulation</span>
-                    <span className="text-[8px] opacity-70">v0.1.3 (Fix-Layout)</span>
+                    <span className="text-[8px] opacity-70">v0.1.4 (Compact)</span>
                 </div>
             </div>
 
