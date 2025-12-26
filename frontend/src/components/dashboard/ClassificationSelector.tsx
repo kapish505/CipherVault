@@ -1,10 +1,3 @@
-/**
- * Classification Selector
- * 
- * Dropdown for selecting file classification during upload
- */
-
-import { useState } from 'react';
 import './ClassificationSelector.css';
 
 interface ClassificationSelectorProps {
@@ -12,76 +5,38 @@ interface ClassificationSelectorProps {
     onChange: (value: 'public' | 'private' | 'confidential') => void;
 }
 
-const OPTIONS = [
-    {
-        value: 'public' as const,
-        label: 'Public',
-        icon: '🌐',
-        description: 'Can be shared freely with anyone'
-    },
-    {
-        value: 'private' as const,
-        label: 'Private',
-        icon: '🔒',
-        description: 'Personal files, default privacy'
-    },
-    {
-        value: 'confidential' as const,
-        label: 'Highly Confidential',
-        icon: '🔐',
-        description: 'Sensitive data with restricted access'
-    }
-];
-
 export function ClassificationSelector({ value, onChange }: ClassificationSelectorProps) {
-    const [showInfo, setShowInfo] = useState(false);
-
+    // We use unique IDs to prevent conflicts if multiple instances existed, though only 1 is used now
     return (
-        <div className="classification-selector">
-            <label className="selector-label">
-                File Classification
-                <button
-                    className="info-btn"
-                    onClick={() => setShowInfo(!showInfo)}
-                    type="button"
-                    title="Learn about classifications"
-                >
-                    ℹ️
-                </button>
-            </label>
+        <div className="glass-radio-group">
+            <input
+                type="radio"
+                id="glass-public"
+                name="classification-selector"
+                checked={value === 'public'}
+                onChange={() => onChange('public')}
+            />
+            <label htmlFor="glass-public">Public</label>
 
-            <select
-                className="classification-select"
-                value={value}
-                onChange={(e) => onChange(e.target.value as any)}
-            >
-                {OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                        {option.icon} {option.label}
-                    </option>
-                ))}
-            </select>
+            <input
+                type="radio"
+                id="glass-private"
+                name="classification-selector"
+                checked={value === 'private'}
+                onChange={() => onChange('private')}
+            />
+            <label htmlFor="glass-private">Private</label>
 
-            {showInfo && (
-                <div className="classification-info">
-                    <div className="info-header">
-                        <strong>Classification Levels</strong>
-                        <button onClick={() => setShowInfo(false)} className="close-info">✕</button>
-                    </div>
-                    {OPTIONS.map(option => (
-                        <div key={option.value} className="info-item">
-                            <span className="info-icon">{option.icon}</span>
-                            <div>
-                                <div className="info-title">{option.label}</div>
-                                <div className="info-desc">{option.description}</div>
-                            </div>
-                        </div>
-                    ))}
-                    <div className="info-footer">
-                        <em>Classification determines future sharing policies and replication strategies.</em>
-                    </div>
-                </div>
-            )}
+            <input
+                type="radio"
+                id="glass-confidential"
+                name="classification-selector"
+                checked={value === 'confidential'}
+                onChange={() => onChange('confidential')}
+            />
+            <label htmlFor="glass-confidential">Highly Confidential</label>
+
+            <div className="glass-glider"></div>
         </div>
     );
 }

@@ -1,108 +1,95 @@
-/**
- * Classification Selector Styles
- */
+/* Glass Radio Group - Premium Classification Selector */
+.glass-radio-group {
+    --bg: rgba(255, 255, 255, 0.05);
+    --text: #a1a1aa;
+    --text-active: #ffffff;
 
-.classification-selector {
-    margin-bottom: var(--space-4);
+    display: flex;
+    position: relative;
+    background: var(--bg);
+    border-radius: var(--radius-full);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        inset 1px 1px 4px rgba(255, 255, 255, 0.05),
+        inset -1px -1px 6px rgba(0, 0, 0, 0.2),
+        0 4px 12px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    width: fit-content;
+    margin: 0 auto var(--space-6);
+    padding: 4px;
 }
 
-.selector-label {
+.glass-radio-group input {
+    display: none;
+}
+
+.glass-radio-group label {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    justify-content: center;
+    width: 140px;
+    /* Fixed equal width for all items */
     font-size: 13px;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-2);
-}
-
-.info-btn {
-    background: none;
-    border: none;
-    font-size: 14px;
+    padding: 10px 20px;
     cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.15s ease;
-    padding: 0;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--text);
+    position: relative;
+    z-index: 2;
+    transition: color 0.3s ease-in-out;
+    border-radius: var(--radius-full);
+    white-space: nowrap;
 }
 
-.info-btn:hover {
-    opacity: 1;
+.glass-radio-group label:hover {
+    color: var(--text-active);
 }
 
-.classification-select {
-    width: 100%;
-    padding: var(--space-2) var(--space-3);
-    background-color: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    color: var(--color-text-primary);
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s ease;
+.glass-radio-group input:checked+label {
+    color: #fff;
 }
 
-.classification-select:focus {
-    outline: none;
-    border-color: var(--color-accent);
+.glass-glider {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    /* Calculated width based on 3 items: (100% - padding) / 3 approximately */
+    /* But since we have fixed structure, we can trust the transform */
+    width: calc((100% - 8px) / 3);
+    border-radius: var(--radius-full);
+    z-index: 1;
+    transition:
+        transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56),
+        background 0.4s ease-in-out,
+        box-shadow 0.4s ease-in-out;
+    pointer-events: none;
 }
 
-.classification-info {
-    margin-top: var(--space-3);
-    padding: var(--space-3);
-    background-color: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    font-size: 13px;
+/* Public (Green/Teal) */
+#glass-public:checked~.glass-glider {
+    transform: translateX(0%);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), #10b981);
+    box-shadow:
+        0 0 18px rgba(16, 185, 129, 0.4),
+        0 0 10px rgba(255, 255, 255, 0.2) inset;
 }
 
-.info-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-3);
-    padding-bottom: var(--space-2);
-    border-bottom: 1px solid var(--color-border);
+/* Private (Blue) */
+#glass-private:checked~.glass-glider {
+    transform: translateX(100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), #3b82f6);
+    box-shadow:
+        0 0 18px rgba(59, 130, 246, 0.4),
+        0 0 10px rgba(255, 255, 255, 0.2) inset;
 }
 
-.close-info {
-    background: none;
-    border: none;
-    color: var(--color-text-tertiary);
-    cursor: pointer;
-    font-size: 16px;
-    padding: 0;
-}
-
-.close-info:hover {
-    color: var(--color-text-primary);
-}
-
-.info-item {
-    display: flex;
-    gap: var(--space-2);
-    padding: var(--space-2) 0;
-}
-
-.info-icon {
-    font-size: 16px;
-}
-
-.info-title {
-    font-weight: 500;
-    color: var(--color-text-primary);
-    margin-bottom: 2px;
-}
-
-.info-desc {
-    font-size: 12px;
-    color: var(--color-text-tertiary);
-}
-
-.info-footer {
-    margin-top: var(--space-3);
-    padding-top: var(--space-2);
-    border-top: 1px solid var(--color-border);
-    font-size: 12px;
-    color: var(--color-text-tertiary);
+/* Highly Confidential (Red) */
+#glass-confidential:checked~.glass-glider {
+    transform: translateX(200%);
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.4), #ef4444);
+    box-shadow:
+        0 0 18px rgba(239, 68, 68, 0.4),
+        0 0 10px rgba(255, 255, 255, 0.2) inset;
 }

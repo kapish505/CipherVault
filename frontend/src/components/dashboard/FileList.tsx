@@ -29,6 +29,7 @@ interface FileListProps {
     selectedFileId?: string;
     activeSection?: 'my-files' | 'shared' | 'recent' | 'starred' | 'trash';
     folderId?: string | null;
+    onFileChange?: () => void;
 }
 
 export function FileList({
@@ -39,7 +40,8 @@ export function FileList({
     onFolderSelect,
     selectedFileId,
     activeSection = 'my-files',
-    folderId = null
+    folderId = null,
+    onFileChange
 }: FileListProps) {
     const { address, isConnected } = useWallet();
     const [files, setFiles] = useState<metadata.FileMetadata[]>([]);
@@ -50,7 +52,25 @@ export function FileList({
     const handleDragStart = (e: React.DragEvent, file: metadata.FileMetadata) => {
         setDraggedFileId(file.id);
         e.dataTransfer.effectAllowed = 'move';
-        // Set invisible drag image or custom one if needed, default is fine
+
+        // Create custom ghost element
+        const ghost = document.createElement('div');
+        ghost.className = 'drag-ghost-item';
+        ghost.innerHTML = `
+            <span class="ghost-icon">${file.mimeType === 'application/folder' ? '📁' : '📄'}</span>
+            <span class="ghost-name">${file.name}</span>
+        `;
+        document.body.appendChild(ghost);
+
+        // Offset slightly to center under cursor
+        e.dataTransfer.setDragImage(ghost, 20, 20);
+
+        // Cleanup
+        setTimeout(() => {
+            if (document.body.contains(ghost)) {
+                document.body.removeChild(ghost);
+            }
+        }, 0);
     };
 
     const handleDragOver = (e: React.DragEvent, targetFile: metadata.FileMetadata) => {
@@ -78,6 +98,7 @@ export function FileList({
             await metadata.moveFileToFolder(draggedFileId, targetFolder.id);
             // Refresh list or optimistic update
             setFiles(prev => prev.filter(f => f.id !== draggedFileId));
+            onFileChange?.();
         } catch (error) {
             console.error('Failed to move file:', error);
             alert('Failed to move file');
@@ -197,6 +218,7 @@ export function FileList({
             try {
                 await metadata.deleteFileMetadata(file.id);
                 setFiles(files.filter(f => f.id !== file.id));
+                onFileChange?.();
             } catch (error) {
                 console.error('Delete error:', error);
                 alert('Failed to delete file.');
@@ -207,6 +229,7 @@ export function FileList({
                 await metadata.moveToTrash(file.id);
                 // Remove from current view
                 setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isTrashed: true } : f));
+                onFileChange?.();
             } catch (error) {
                 console.error('Trash error:', error);
             }
@@ -218,6 +241,7 @@ export function FileList({
             await metadata.restoreFromTrash(file.id);
             // Remove from trash view (or update status)
             setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isTrashed: false } : f));
+            onFileChange?.();
         } catch (error) {
             console.error('Restore error:', error);
         }
@@ -227,6 +251,7 @@ export function FileList({
         try {
             await metadata.toggleStar(file.id);
             setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isStarred: !f.isStarred } : f));
+            onFileChange?.();
         } catch (error) {
             console.error('Star error:', error);
         }

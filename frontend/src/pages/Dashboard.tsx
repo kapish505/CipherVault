@@ -263,6 +263,7 @@ export function Dashboard() {
                         selectedFileId={selectedFile?.id}
                         activeSection={activeSection}
                         folderId={currentFolderId}
+                        onFileChange={reloadFolders}
                     />
                 </div>
             </main>
@@ -290,6 +291,7 @@ export function Dashboard() {
                                 className="context-action-btn"
                                 onClick={() => metadata.toggleStar(selectedFile.id).then(() => {
                                     setRefreshTrigger(p => p + 1);
+                                    reloadFolders();
                                     // Optimistic update
                                     setSelectedFile({ ...selectedFile, isStarred: !selectedFile.isStarred });
                                 })}

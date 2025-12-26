@@ -107,6 +107,10 @@ function openDB(): Promise<IDBDatabase> {
  * Save file metadata
  */
 export async function saveFileMetadata(metadata: FileMetadata): Promise<void> {
+    // Normalize wallet address
+    if (metadata.walletAddress) {
+        metadata.walletAddress = metadata.walletAddress.toLowerCase();
+    }
     const db = await openDB();
 
     return new Promise((resolve, reject) => {
@@ -128,13 +132,14 @@ export async function saveFileMetadata(metadata: FileMetadata): Promise<void> {
  * Get all files for a wallet address
  */
 export async function getFilesByWallet(walletAddress: string): Promise<FileMetadata[]> {
+    const normalizedAddress = walletAddress.toLowerCase();
     const db = await openDB();
 
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
         const index = store.index('walletAddress');
-        const request = index.getAll(walletAddress);
+        const request = index.getAll(normalizedAddress);
 
         request.onsuccess = () => {
             const files = request.result as FileMetadata[];
@@ -247,6 +252,7 @@ export async function updateAccessTime(id: string): Promise<void> {
  * Create a new folder
  */
 export async function createFolder(name: string, walletAddress: string, parentId?: string | null): Promise<string> {
+    const normalizedAddress = walletAddress.toLowerCase();
     const id = crypto.randomUUID();
     const folder: any = {
         id,
@@ -258,7 +264,7 @@ export async function createFolder(name: string, walletAddress: string, parentId
         encryptedKey: '',
         keyIV: '',
         fileIV: '',
-        walletAddress,
+        walletAddress: normalizedAddress,
         folderId: parentId,
         isTrashed: false,
         isStarred: false
@@ -287,7 +293,8 @@ export async function shareFile(id: string): Promise<void> {
  * Clear all files for a wallet (used on disconnect)
  */
 export async function clearWalletFiles(walletAddress: string): Promise<void> {
-    const files = await getFilesByWallet(walletAddress);
+    const normalizedAddress = walletAddress.toLowerCase();
+    const files = await getFilesByWallet(normalizedAddress);
     const db = await openDB();
 
     return new Promise((resolve, reject) => {

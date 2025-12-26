@@ -5,6 +5,8 @@
 import { useState, useRef } from 'react';
 import { useWallet } from '@/hooks/useWallet';
 import { useUploadQueue } from '@/hooks/useUploadQueue';
+import { ClassificationSelector } from './ClassificationSelector';
+import { UploadButton3D } from './UploadButton3D';
 import './FileUpload.css';
 import { toast } from 'sonner';
 
@@ -144,25 +146,12 @@ export function FileUpload({ onUploadComplete, currentFolderId }: FileUploadProp
             </div>
 
             {/* Classification Selection */}
-            <div className="classification-grid">
-                {Object.entries(CLASSIFICATIONS).map(([key, config]) => (
-                    <button
-                        key={key}
-                        type="button"
-                        className={`classification-card ${classification === key ? 'active' : ''}`}
-                        onClick={() => setClassification(key as any)}
-                        style={{
-                            borderColor: classification === key ? config.color : 'var(--color-border)',
-                            backgroundColor: classification === key ? `${config.color}10` : 'var(--color-bg-secondary)'
-                        }}
-                    >
-                        <div className="classification-card-header">
-                            <span className="classification-card-icon">{config.icon}</span>
-                            <span className="classification-card-label">{config.label}</span>
-                        </div>
-                        <p className="classification-card-desc">{config.description}</p>
-                    </button>
-                ))}
+            {/* Classification Selection */}
+            <div className="classification-selector-container">
+                <ClassificationSelector
+                    value={classification}
+                    onChange={setClassification}
+                />
             </div>
 
             {/* Classification Details */}
@@ -207,24 +196,18 @@ export function FileUpload({ onUploadComplete, currentFolderId }: FileUploadProp
                 <p className="dropzone-subtitle">or choose from options below</p>
 
                 <div className="upload-actions">
-                    <button
-                        type="button"
-                        className="upload-btn upload-btn-primary"
+                    <UploadButton3D
+                        label="Select Files"
                         onClick={handleFileClick}
-                        disabled={isUploading}
-                    >
-                        <span className="btn-icon">📄</span>
-                        <span>Select Files</span>
-                    </button>
-                    <button
-                        type="button"
-                        className="upload-btn upload-btn-secondary"
+                        icon="📄"
+                        variant="blue"
+                    />
+                    <UploadButton3D
+                        label="Select Folder"
                         onClick={handleFolderClick}
-                        disabled={isUploading}
-                    >
-                        <span className="btn-icon">📂</span>
-                        <span>Select Folder</span>
-                    </button>
+                        icon="📂"
+                        variant="green"
+                    />
                 </div>
 
                 <div className="upload-features">

@@ -1,0 +1,146 @@
+/* 3D Upload Button Styles - Adapted from Uiverse.io */
+.upload-3d-container {
+    --transition: 350ms;
+    --folder-W: 120px;
+    --folder-H: 80px;
+    /* Brand Colors */
+    --color-folder-main: #3b82f6;
+    --color-folder-dark: #2563eb;
+    --color-folder-light: #60a5fa;
+    --bg-gradient: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 20px;
+    background: var(--bg-gradient);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    height: 180px;
+    width: 220px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.upload-3d-container:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.upload-3d-folder {
+    position: absolute;
+    top: -10px;
+    left: calc(50% - 60px);
+    animation: float 3s infinite ease-in-out;
+    transition: transform var(--transition) ease;
+}
+
+.upload-3d-folder:hover {
+    transform: scale(1.05);
+}
+
+.upload-3d-folder .front-side,
+.upload-3d-folder .back-side {
+    position: absolute;
+    transition: transform var(--transition);
+    transform-origin: bottom center;
+}
+
+.upload-3d-folder .back-side::before,
+.upload-3d-folder .back-side::after {
+    content: "";
+    display: block;
+    background-color: white;
+    opacity: 0.5;
+    z-index: 0;
+    width: var(--folder-W);
+    height: var(--folder-H);
+    position: absolute;
+    transform-origin: bottom center;
+    border-radius: 15px;
+    transition: transform 350ms;
+}
+
+.upload-3d-container:hover .back-side::before {
+    transform: rotateX(-5deg) skewX(5deg);
+}
+
+.upload-3d-container:hover .back-side::after {
+    transform: rotateX(-15deg) skewX(12deg);
+}
+
+.upload-3d-folder .front-side {
+    z-index: 1;
+}
+
+.upload-3d-container:hover .front-side {
+    transform: rotateX(-40deg) skewX(15deg);
+}
+
+.upload-3d-folder .tip {
+    background: linear-gradient(135deg, var(--color-folder-light), var(--color-folder-main));
+    width: 80px;
+    height: 20px;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: -10px;
+    z-index: 2;
+}
+
+.upload-3d-folder .cover {
+    background: linear-gradient(135deg, var(--color-folder-main), var(--color-folder-dark));
+    width: var(--folder-W);
+    height: var(--folder-H);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.upload-3d-btn {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background var(--transition) ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 12px 20px;
+    position: relative;
+    margin-top: auto;
+    backdrop-filter: blur(5px);
+}
+
+.upload-3d-container:hover .upload-3d-btn {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+}
+
+.upload-3d-btn:active {
+    transform: scale(0.98);
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}

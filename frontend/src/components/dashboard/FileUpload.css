@@ -90,53 +90,11 @@
     line-height: 1.5;
 }
 
-/* Classification Grid */
-.classification-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-3);
-}
-
-.classification-card {
-    padding: var(--space-4);
-    border: 2px solid;
-    border-radius: var(--radius-lg);
-    background-color: var(--color-bg-secondary);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-}
-
-.classification-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.classification-card.active {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.classification-card-header {
+/* Classification Selector */
+.classification-selector-container {
     display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
-}
-
-.classification-card-icon {
-    font-size: 24px;
-}
-
-.classification-card-label {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--color-text-primary);
-}
-
-.classification-card-desc {
-    font-size: 13px;
-    color: var(--color-text-secondary);
-    margin: 0;
+    justify-content: center;
+    margin-bottom: var(--space-4);
 }
 
 /* Classification Details */
