@@ -11,6 +11,7 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@/hooks/useWallet';
 import { useFolders } from '@/hooks/useFolders';
+import { useStorage } from '@/hooks/useStorage';
 import { FileUpload } from '@/components/dashboard/FileUpload';
 import { FileList } from '@/components/dashboard/FileList';
 import { Sidebar } from '@/components/dashboard/Sidebar'; // Added
