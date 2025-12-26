@@ -14,15 +14,25 @@ export function Navbar() {
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
 
+    const isHome = location.pathname === '/';
+
+    // Scroll detection (only relevant for Home)
     useEffect(() => {
+        if (!isHome) return;
+
         const handleScroll = () => {
-            // Threshold can be adjusted (e.g., 600 for hero height)
             setIsScrolled(window.scrollY > 600);
         };
 
+        // Initial check
+        handleScroll();
+
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [isHome]);
+
+    // Force 'scrolled' style (glass/tint) if not on Home, or if scrolled on Home
+    const showGlass = !isHome || isScrolled;
 
     const isActive = (path: string) => {
         if (path === '/') {
@@ -31,14 +41,8 @@ export function Navbar() {
         return location.pathname.startsWith(path);
     };
 
-    // Hide Navbar on dashboard as it has its own sidebar layout
-    // User requested to KEEP it but fix alignment.
-    // if (location.pathname.startsWith('/app')) {
-    //    return null;
-    // }
-
     return (
-        <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <nav className={`navbar ${showGlass ? 'scrolled' : ''}`}>
             <div className="navbar-container">
                 {/* Logo */}
                 <Link to="/" className="navbar-logo">
