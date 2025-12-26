@@ -1,6 +1,4 @@
 {
-    "installCommand": "npm install -g npm-run-all vite && npm install",
-    "buildCommand": "vite build",
     "framework": "vite",
     "rewrites": [
         {
