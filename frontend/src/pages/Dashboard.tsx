@@ -341,129 +341,22 @@ export function Dashboard() {
     return (
         <div className="dashboard-page">
             {/* Left Sidebar */}
-            <aside className="dashboard-sidebar">
-                <div className="sidebar-section">
-                    <div className="sidebar-group">
-                        <button
-                            className={`sidebar-item ${activeSection === 'my-files' ? 'active' : ''}`}
-                            onClick={() => { setActiveSection('my-files'); setCurrentFolderId(null); }}
-                        >
-                            <span className="sidebar-icon">📁</span>
-                            <span className="sidebar-label">My Files</span>
-                        </button>
-                        <button
-                            className={`sidebar-item ${activeSection === 'shared' ? 'active' : ''}`}
-                            onClick={() => setActiveSection('shared')}
-                        >
-                            <span className="sidebar-icon">👥</span>
-                            <span className="sidebar-label">Shared</span>
-                        </button>
-                    </div>
-
-                    <div className="sidebar-divider"></div>
-
-                    {/* Pinned Folders Section */}
-                    {pinnedFolders.length > 0 && (
-                        <>
-                            <div className="sidebar-group-label">Pinned Folders</div>
-                            <div className="sidebar-group">
-                                {pinnedFolders.map(folder => (
-                                    <button
-                                        key={folder.id}
-                                        className={`sidebar-item ${currentFolderId === folder.id ? 'active' : ''}`}
-                                        onClick={() => {
-                                            setActiveSection('my-files');
-                                            setCurrentFolderId(folder.id);
-                                        }}
-                                    >
-                                        <span className="sidebar-icon">📌</span>
-                                        <span className="sidebar-label">{folder.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="sidebar-divider"></div>
-                        </>
-                    )}
-
-                    {/* Starred Files Section */}
-                    {starredFiles.length > 0 && (
-                        <>
-                            <div className="sidebar-group-label">Starred Files</div>
-                            <div className="sidebar-group">
-                                {starredFiles.filter(f => f.mimeType !== 'application/folder').map(file => (
-                                    <button
-                                        key={file.id}
-                                        className={`sidebar-item`}
-                                        onClick={() => {
-                                            // TODO: What should happen when clicking a starred file in sidebar?
-                                            // Probably select it or preview it.
-                                            // For now, let's navigate to its folder and select it?
-                                            // Or simplified: select file if we have a way to highlight it.
-                                            // Easier: Just handle it like handleFileSelect from Dashboard if possible,
-                                            // but we don't have direct access here easily without context.
-                                            // Actually, sidebar items usually navigate.
-                                            // If we just want to VIEW them, maybe 'starred' section is enough?
-                                            // User said: "if i star a folder it automatically appears on left sidebar but this doesnt work for a normal file"
-                                            // They likely just want to see it there for quick access.
-                                            // Let's implement basic selection if possible, otherwise just a visual list.
-                                            // But standard sidebar items are usually "filters" or "locations".
-                                            // Individual files in sidebar is unusual unless they are "shortcuts".
-                                            // Let's at least show them.
-                                            setActiveSection('starred');
-                                        }}
-                                    >
-                                        <span className="sidebar-icon">📄</span>
-                                        <span className="sidebar-label">{file.name}</span>
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="sidebar-divider"></div>
-                        </>
-                    )}
-
-                    <div className="sidebar-group">
-                        <button
-                            className={`sidebar-item ${activeSection === 'recent' ? 'active' : ''}`}
-                            onClick={() => setActiveSection('recent')}
-                        >
-                            <span className="sidebar-icon">🕐</span>
-                            <span className="sidebar-label">Recent</span>
-                        </button>
-                        <button
-                            className={`sidebar-item ${activeSection === 'starred' ? 'active' : ''}`}
-                            onClick={() => setActiveSection('starred')}
-                        >
-                            <span className="sidebar-icon">⭐</span>
-                            <span className="sidebar-label">Starred</span>
-                        </button>
-                    </div>
-
-                    <div className="sidebar-divider"></div>
-
-                    <div className="sidebar-group">
-                        <button
-                            className={`sidebar-item ${activeSection === 'trash' ? 'active' : ''}`}
-                            onClick={() => setActiveSection('trash')}
-                        >
-                            <span className="sidebar-icon">🗑️</span>
-                            <span className="sidebar-label">Trash</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div className="sidebar-footer">
-                    <div className="storage-info">
-                        <div className="storage-header">
-                            <span className="storage-label">Storage</span>
-                            <span className="storage-badge">Unlimited</span>
-                        </div>
-                        <div className="storage-bar">
-                            <div className="storage-used" style={{ width: '0%' }}></div>
-                        </div>
-                        <div className="storage-text">Zero-knowledge encrypted</div>
-                    </div>
-                </div>
-            </aside>
+            <Sidebar
+                activeSection={activeSection}
+                onSectionChange={setActiveSection}
+                pinnedFolders={pinnedFolders}
+                starredFiles={starredFiles}
+                currentFolderId={currentFolderId}
+                onFolderSelect={setCurrentFolderId}
+                storageProps={{
+                    usedBytes,
+                    totalLimit,
+                    baseLimit,
+                    earnedLimit,
+                    nodeStatus,
+                    onToggleStatus: () => setNodeStatus(prev => prev === 'online' ? 'offline' : 'online')
+                }}
+            />
 
             {/* Main Content */}
             <main className="dashboard-main">
@@ -576,22 +469,7 @@ export function Dashboard() {
                         onFileChange={reloadFolders}
                         onDelete={handleDeleteFile}
                     />
-                    <Sidebar
-                        activeSection={activeSection}
-                        onSectionChange={setActiveSection}
-                        pinnedFolders={pinnedFolders}
-                        starredFiles={starredFiles}
-                        currentFolderId={currentFolderId}
-                        onFolderSelect={setCurrentFolderId}
-                        storageProps={{
-                            usedBytes,
-                            totalLimit,
-                            baseLimit,
-                            earnedLimit,
-                            nodeStatus,
-                            onToggleStatus: () => setNodeStatus(prev => prev === 'online' ? 'offline' : 'online')
-                        }}
-                    />    </div>
+                </div>
             </main>
 
             {/* Global Dialog */}
