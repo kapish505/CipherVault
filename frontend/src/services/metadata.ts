@@ -158,13 +158,12 @@ export async function getFilesByWallet(walletAddress: string): Promise<FileMetad
         request.onsuccess = () => {
             const files = request.result as FileMetadata[];
 
-            // Demo: Initialize replica state if missing
+            // Initialize defaults only if critical fields are missing (Real Logic)
+            // We do NOT fake replicas anymore.
             files.forEach(f => {
-                if (f.targetReplicas === undefined) {
-                    f.targetReplicas = 3;
-                    f.currentReplicas = f.cid ? 1 : 0; // Default to 1 if uploaded
-                    f.healthStatus = 'Degraded'; // Assume degraded until checked
-                }
+                if (f.targetReplicas === undefined) f.targetReplicas = 3;
+                if (f.currentReplicas === undefined) f.currentReplicas = 1; // Default to 1 (Home)
+                if (!f.healthStatus) f.healthStatus = 'Degraded';
             });
 
             // Sort by upload date (newest first)
@@ -435,6 +434,9 @@ export async function verifyReplicas(cid: string): Promise<number> {
 /**
  * Heal a file (Real Check)
  */
+/**
+ * Heal a file (Real Active Repair)
+ */
 export async function healFile(id: string): Promise<void> {
     const file = await getFileById(id);
     if (!file || !file.cid) return;
@@ -443,25 +445,39 @@ export async function healFile(id: string): Promise<void> {
     file.healthStatus = 'Recovering';
     await saveFileMetadata(file);
 
-    // 2. Perform Real Network Check
+    try {
+        // 2. Dynamic Import to avoid circular dependency if not careful, or just rely on module cache
+        // Using active pinning to "Heal"
+        const ipfs = await import('./ipfs');
+        await ipfs.pinByHash(file.cid, file.name); // Active Repair: Ask Pinata to pin it
+    } catch (e) {
+        console.error("Healing/Pinning failed:", e);
+    }
+
+    // 3. Perform Real Network Check (Verification)
+    // Wait slightly for propagation if desired, but we check immediately for feedback
     const activeReplicas = await verifyReplicas(file.cid);
 
-    // 3. Update State
-    // Re-fetch to ensure no concurrent updates
+    // 4. Update State based on Reality
     const freshFile = await getFileById(id);
     if (freshFile) {
         freshFile.currentReplicas = activeReplicas;
         freshFile.lastHealed = Date.now();
 
-        const target = freshFile.targetReplicas || 3;
+        // Rule: If we have > 0 active replicas confirmed via Gateways OR we successfully pinned it (implied),
+        // we can be more generous. But strictly, let's stick to Gateway checks.
+        // If Pinata pinned it, at least 1 gateway (Pinata's) should see it.
 
-        // If we found it on at least 2 gateways, we consider it "Healthy" for this MVP
-        // (Since finding it on 3/3 is rare instantly)
-        if (freshFile.currentReplicas >= 2) {
+        if (activeReplicas >= 2) {
             freshFile.healthStatus = 'Healthy';
+        } else if (activeReplicas > 0) {
+            freshFile.healthStatus = 'Degraded'; // Still degraded if < 2, but present
         } else {
             freshFile.healthStatus = 'Degraded';
         }
+
+        // Forced "Healthy" override if we trust Pinata (optional, but safer to trust gateways)
+        // If gateways perform well, we see 2-3.
 
         await saveFileMetadata(freshFile);
     }

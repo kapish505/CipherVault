@@ -116,3 +116,34 @@ export async function downloadFile(cid: string): Promise<ArrayBuffer> {
 export async function isConfigured(): Promise<boolean> {
     return !!import.meta.env.VITE_PINATA_JWT;
 }
+
+/**
+ * Trigger Pinata to pin an existing CID (Healing)
+ */
+export async function pinByHash(cid: string, name?: string): Promise<boolean> {
+    try {
+        if (!PINATA_JWT) return false;
+
+        const response = await fetch('https://api.pinata.cloud/pinning/pinByHash', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${PINATA_JWT}`
+            },
+            body: JSON.stringify({
+                hashToPin: cid,
+                pinataMetadata: {
+                    name: name || `Healed File ${cid.substring(0, 6)}`
+                }
+            })
+        });
+
+        if (response.ok) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Failed to pin by hash:', error);
+        return false;
+    }
+}
