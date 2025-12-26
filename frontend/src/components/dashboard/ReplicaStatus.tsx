@@ -18,7 +18,12 @@ export function ReplicaStatus({ fileId }: ReplicaStatusProps) {
     useEffect(() => {
         const fetchReplicaStatus = async () => {
             try {
-                const res = await fetch(`/api/replica?fileId=${encodeURIComponent(fileId)}`);
+                // Note: In a real app, we would look up the CID from the fileId (metadata).
+                // For now, if fileId looks like a CID, we use it directly.
+                // Or we fetch everything and filter (but that's slow).
+                // Let's assume fileId IS the CID for this component usage, 
+                // OR we pass `cid` query param properly.
+                const res = await fetch(`/api/replica?cid=${encodeURIComponent(fileId)}`);
                 if (!res.ok) throw new Error('Network response was not ok');
                 const json: ReplicaData = await res.json();
                 setData(json);
