@@ -10,8 +10,13 @@
 
 .dashboard-page {
     display: flex;
-    height: calc(100vh - 64px);
+    height: 100vh;
     background-color: var(--color-bg-primary);
+    padding-top: 80px;
+    /* Space for Fixed Navbar */
+    box-sizing: border-box;
+    overflow: hidden;
+    /* Prevent double scrollbars, sidebar/content handle their own scroll */
 }
 
 /* ===== SIDEBAR (Polished) ===== */

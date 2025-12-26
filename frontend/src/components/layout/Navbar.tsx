@@ -32,9 +32,10 @@ export function Navbar() {
     };
 
     // Hide Navbar on dashboard as it has its own sidebar layout
-    if (location.pathname.startsWith('/app')) {
-        return null;
-    }
+    // User requested to KEEP it but fix alignment.
+    // if (location.pathname.startsWith('/app')) {
+    //    return null;
+    // }
 
     return (
         <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
