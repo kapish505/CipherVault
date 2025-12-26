@@ -27,7 +27,7 @@ import { initDatabase, closeDatabase } from './db/index.js';
 import ipfsRoutes from './routes/ipfs.js';
 import filesRoutes from './routes/files.js';
 import sharesRoutes from './routes/shares.js';
-import foldersRoutes from './routes/folders.js';
+import replicaRoutes from './routes/replica.js';
 
 /**
  * Initialize database
@@ -92,7 +92,7 @@ app.get('/health', (_req, res) => {
 app.use('/api/ipfs', upload.single('file'), ipfsRoutes);
 app.use('/api/files', filesRoutes);
 app.use('/api/shares', sharesRoutes);
-app.use('/api/folders', foldersRoutes);
+app.use('/api/replica', replicaRoutes);
 
 // 404 handler
 app.use((_req, res) => {

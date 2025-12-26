@@ -53,7 +53,7 @@ export function TrustSection() {
                     <p>
                         Traditional cloud storage requires you to trust the provider.
                         <br />
-                        CipherVault is designed so you don't have to.
+                        CipherVault is designed so you don&apos;t have to.
                     </p>
                 </div>
 

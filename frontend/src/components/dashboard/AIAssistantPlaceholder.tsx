@@ -56,9 +56,9 @@ export function AIAssistantPlaceholder() {
 
                             <h4>Example Queries</h4>
                             <div className="example-queries">
-                                <code>"Show me PDFs from last week"</code>
-                                <code>"Find confidential files"</code>
-                                <code>"Images larger than 5MB"</code>
+                                <code>&quot;Show me PDFs from last week&quot;</code>
+                                <code>&quot;Find confidential files&quot;</code>
+                                <code>&quot;Images larger than 5MB&quot;</code>
                             </div>
 
                             <div className="ai-footer">

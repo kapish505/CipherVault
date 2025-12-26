@@ -195,6 +195,7 @@ export function FileUpload({ onUploadComplete }: FileUploadProps) {
                     type="file"
                     /* @ts-ignore */
                     webkitdirectory=""
+                    // eslint-disable-next-line react/no-unknown-property
                     directory=""
                     onChange={handleFileInput}
                     style={{ display: 'none' }}

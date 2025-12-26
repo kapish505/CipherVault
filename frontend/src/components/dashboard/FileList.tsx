@@ -137,7 +137,7 @@ export function FileList({
                     <>
                         <span className="empty-icon">🔍</span>
                         <h3>No files found</h3>
-                        <p>No files match "{searchQuery}"</p>
+                        <p>No files match &quot;{searchQuery}&quot;</p>
                     </>
                 ) : (
                     <>

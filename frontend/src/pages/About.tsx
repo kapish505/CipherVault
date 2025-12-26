@@ -146,7 +146,7 @@ export function About() {
                 <div className="container">
                     <h2>Upcoming Features</h2>
                     <p className="about-lead">
-                        CipherVault is under active development. Here's what's coming next:
+                        CipherVault is under active development. Here&apos;s what&apos;s coming next:
                     </p>
 
                     <div className="features-grid">
