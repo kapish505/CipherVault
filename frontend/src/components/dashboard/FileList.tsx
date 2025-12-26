@@ -26,10 +26,15 @@ interface FileListProps {
     searchQuery?: string;
     onFileSelect?: (file: metadata.FileMetadata) => void;
     onFolderSelect?: (folderId: string) => void;
-    selectedFileId?: string;
+    selectedFileId?: string; // Legacy support
+    selectedIds?: Set<string>;
+    onSelectionChange?: (ids: Set<string>) => void;
+    draggedItems?: metadata.FileMetadata[];
+    onDragItemsChange?: (items: metadata.FileMetadata[]) => void;
     activeSection?: 'my-files' | 'shared' | 'recent' | 'starred' | 'trash';
     folderId?: string | null;
     onFileChange?: () => void;
+    onDelete?: (file: metadata.FileMetadata) => void;
 }
 
 export function FileList({
@@ -39,9 +44,14 @@ export function FileList({
     onFileSelect,
     onFolderSelect,
     selectedFileId,
+    selectedIds,
+    onSelectionChange,
+    draggedItems,
+    onDragItemsChange,
     activeSection = 'my-files',
     folderId = null,
-    onFileChange
+    onFileChange,
+    onDelete
 }: FileListProps) {
     const { address, isConnected } = useWallet();
     const [files, setFiles] = useState<metadata.FileMetadata[]>([]);
@@ -68,27 +78,37 @@ export function FileList({
     };
 
     const handleDragStart = (e: React.DragEvent, file: metadata.FileMetadata) => {
-        setDraggedFileId(file.id);
+        // If dragging a file that is not selected, select it (and deselect others)
+        // Unless it is part of the existing selection
+        if (selectedIds && !selectedIds.has(file.id)) {
+            if (onSelectionChange) onSelectionChange(new Set([file.id]));
+            if (onDragItemsChange) onDragItemsChange([file]);
+        } else if (selectedIds && selectedIds.has(file.id)) {
+            // Dragging a selection
+            // Ensure dragItems are set correctly in parent if not already
+            if (onDragItemsChange) {
+                const selectedFiles = files.filter(f => selectedIds.has(f.id));
+                onDragItemsChange(selectedFiles);
+            }
+        }
+
+        setDraggedFileId(file.id); // Internal tracking for drop target validation
         e.dataTransfer.effectAllowed = 'move';
 
-        // Create custom ghost element
+        // Custom Ghost
+        const count = selectedIds && selectedIds.has(file.id) ? selectedIds.size : 1;
+        const label = count > 1 ? `${count} items` : file.name;
+
         const ghost = document.createElement('div');
         ghost.className = 'drag-ghost-item';
         ghost.innerHTML = `
-            <span class="ghost-icon">${file.mimeType === 'application/folder' ? '📁' : '📄'}</span>
-            <span class="ghost-name">${file.name}</span>
+            <span class="ghost-icon">${count > 1 ? '📚' : (file.mimeType === 'application/folder' ? '📁' : '📄')}</span>
+            <span class="ghost-name">${label}</span>
         `;
         document.body.appendChild(ghost);
-
-        // Offset slightly to center under cursor
         e.dataTransfer.setDragImage(ghost, 20, 20);
 
-        // Cleanup
-        setTimeout(() => {
-            if (document.body.contains(ghost)) {
-                document.body.removeChild(ghost);
-            }
-        }, 0);
+        setTimeout(() => { if (document.body.contains(ghost)) document.body.removeChild(ghost); }, 0);
     };
 
     const handleDragOver = (e: React.DragEvent, targetFile: metadata.FileMetadata) => {
@@ -145,6 +165,13 @@ export function FileList({
 
         loadFiles();
     }, [address, isConnected, refreshTrigger, folderId]); // Added folderId dependency
+
+    const getDaysLeft = (trashedAt?: number) => {
+        if (!trashedAt) return '30 days';
+        const daysPassed = (Date.now() - trashedAt) / (1000 * 60 * 60 * 24);
+        const daysLeft = Math.max(0, 30 - daysPassed);
+        return `${Math.ceil(daysLeft)} days`;
+    };
 
     const filteredFiles = useMemo(() => {
         let result = files;
@@ -253,6 +280,12 @@ export function FileList({
     };
 
     const handleDelete = async (file: metadata.FileMetadata) => {
+        if (onDelete) {
+            onDelete(file);
+            return;
+        }
+
+        /* Fallback for safety */
         if (activeSection === 'trash') {
             if (!confirm(`Permanently delete "${file.name}"? This cannot be undone.`)) {
                 return;
@@ -300,10 +333,51 @@ export function FileList({
         }
     };
 
-    const handleItemClick = async (file: metadata.FileMetadata) => {
+    const handleItemClick = async (file: metadata.FileMetadata, e?: React.MouseEvent) => {
+        // Multi-select logic
+        if (onSelectionChange && selectedIds) {
+            const isMultiSelect = e?.metaKey || e?.ctrlKey;
+
+            if (isMultiSelect) {
+                const newSelection = new Set(selectedIds);
+                if (newSelection.has(file.id)) {
+                    newSelection.delete(file.id);
+                } else {
+                    newSelection.add(file.id);
+                }
+                onSelectionChange(newSelection);
+
+                // If dragging state exists, update it too
+                if (onDragItemsChange) {
+                    // Filter files that are in the new selection
+                    // This requires 'files' state to be available. 'filteredFiles' is better.
+                    const selectedFiles = files.filter(f => newSelection.has(f.id));
+                    onDragItemsChange(selectedFiles);
+                }
+                // Don't open context panel on multi-select
+                if (newSelection.size > 1) {
+                    onFileSelect?.(null as any); // Clear single file selection
+                } else if (newSelection.size === 1) {
+                    onFileSelect?.(files.find(f => f.id === Array.from(newSelection)[0])!);
+                }
+                return;
+            }
+        }
+
         if (file.mimeType === 'application/folder') {
+            if (activeSection === 'trash') {
+                // Select it
+                if (onSelectionChange) onSelectionChange(new Set([file.id]));
+                onFileSelect?.(file);
+                return;
+            }
             onFolderSelect?.(file.id);
             return;
+        }
+
+        // Single select (default)
+        if (onSelectionChange) {
+            onSelectionChange(new Set([file.id]));
         }
 
         // Update interaction time
@@ -461,7 +535,7 @@ export function FileList({
                             Size {getSortIcon('size')}
                         </th>
                         <th className="col-modified" onClick={() => handleSort('uploadedAt')}>
-                            Modified {getSortIcon('uploadedAt')}
+                            {activeSection === 'trash' ? 'Days Left' : 'Modified'} {getSortIcon('uploadedAt')}
                         </th>
                         <th className="col-replica">Replicas</th>
                         <th className="col-status">Status</th>
@@ -474,14 +548,15 @@ export function FileList({
                             key={file.id}
                             className={`
                 ${downloadingId === file.id ? 'downloading' : ''}
-                ${selectedFileId === file.id ? 'selected' : ''}
+                ${selectedFileId === file.id || (selectedIds && selectedIds.has(file.id)) ? 'selected' : ''}
+                ${draggedItems && draggedItems.some(i => i.id === file.id) ? 'opacity-50' : ''}
               `}
                             draggable={activeSection === 'my-files'}
                             onDragStart={(e) => handleDragStart(e, file)}
                             onDragOver={(e) => handleDragOver(e, file)}
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, file)}
-                            onClick={() => handleItemClick(file)}
+                            onClick={(e) => handleItemClick(file, e)}
                         >
                             <td className="col-name">
                                 <div className="file-name-cell">
@@ -508,7 +583,15 @@ export function FileList({
                                 <span className="file-type">{file.mimeType.split('/')[0]}</span>
                             </td>
                             <td className="col-size">{formatFileSize(file.size)}</td>
-                            <td className="col-modified">{formatDate(file.uploadedAt)}</td>
+                            <td className="col-modified">
+                                {activeSection === 'trash' ? (
+                                    <span className="text-warning">
+                                        {getDaysLeft(file.trashedAt)}
+                                    </span>
+                                ) : (
+                                    formatDate(file.uploadedAt)
+                                )}
+                            </td>
                             <td className="col-replica">
                                 <ReplicaStatus fileId={file.id} />
                             </td>

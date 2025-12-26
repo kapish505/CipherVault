@@ -504,41 +504,40 @@
     word-break: break-word;
 }
 
+/* Context Actions - Fix button spacing */
+.context-actions {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+}
+
+.context-action-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.context-action-btn:hover {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-text-tertiary);
+}
+
 .context-section {
     margin-bottom: var(--space-6);
 }
 
-.context-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-text-tertiary);
-    margin-bottom: var(--space-3);
-}
-
-.security-status {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-}
-
-.security-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: 12px;
-    color: var(--color-text-secondary);
-}
-
-.security-icon {
-    font-size: 14px;
-    opacity: 0.7;
-}
-
-.security-text {
-    flex: 1;
-}
+/* ... labels ... */
 
 .property-list {
     display: flex;
@@ -549,17 +548,29 @@
 .property-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    /* Align vertically center */
     font-size: 12px;
+    gap: var(--space-2);
+    /* Prevent touching */
 }
 
 .property-key {
     color: var(--color-text-tertiary);
     font-weight: 500;
+    flex-shrink: 0;
+    /* Don't shrink label */
 }
 
 .property-value {
     color: var(--color-text-primary);
     text-align: right;
+    /* Truncate long values */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    /* Flexbox truncation trick */
 }
 
 .property-mono {

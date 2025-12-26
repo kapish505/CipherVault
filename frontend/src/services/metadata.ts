@@ -57,6 +57,7 @@ export interface FileMetadata {
     sharedWith?: string[]; // List of wallet addresses or emails (simulated)
     accessedAt?: number;
     path?: string[]; // Breadcrumb path IDs
+    trashedAt?: number;
 }
 
 /**
@@ -70,6 +71,7 @@ export interface FolderMetadata {
     parentId?: string | null;
     path?: string[];
     isTrashed?: boolean;
+    trashedAt?: number;
     isStarred?: boolean;
 }
 
@@ -212,6 +214,7 @@ export async function moveToTrash(id: string): Promise<void> {
     if (!file) return;
 
     file.isTrashed = true;
+    file.trashedAt = Date.now();
     await saveFileMetadata(file);
 }
 
@@ -223,7 +226,23 @@ export async function restoreFromTrash(id: string): Promise<void> {
     if (!file) return;
 
     file.isTrashed = false;
+    file.trashedAt = undefined;
     await saveFileMetadata(file);
+}
+
+/**
+ * Permanently delete files in trash older than 30 days
+ */
+export async function cleanupTrash(walletAddress: string): Promise<void> {
+    const normalizedAddress = walletAddress.toLowerCase();
+    const files = await getFilesByWallet(normalizedAddress);
+    const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+
+    for (const file of files) {
+        if (file.isTrashed && file.trashedAt && file.trashedAt < thirtyDaysAgo) {
+            await deleteFileMetadata(file.id);
+        }
+    }
 }
 
 /**
