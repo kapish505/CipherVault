@@ -1,5 +1,5 @@
 {
-    "installCommand": "npm install -g npm-run-all && npm install",
-    "buildCommand": "npm run build",
+    "installCommand": "npm install -g npm-run-all vite && npm install",
+    "buildCommand": "vite build",
     "framework": "vite"
 }
