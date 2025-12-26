@@ -16,7 +16,7 @@
 
 /* ===== SIDEBAR (Polished) ===== */
 .dashboard-sidebar {
-    width: 220px;
+    width: 260px;
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
@@ -713,7 +713,7 @@
 @media (max-width: 768px) {
     .dashboard-sidebar {
         position: fixed;
-        left: -220px;
+        left: -260px;
         top: 64px;
         height: calc(100vh - 64px);
         z-index: 100;

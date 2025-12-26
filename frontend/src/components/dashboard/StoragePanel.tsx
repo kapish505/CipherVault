@@ -38,47 +38,47 @@ export function StoragePanel({
                 </button>
             </div>
 
-            <div className="mb-1 flex justify-between text-xs">
-                <span className={isOverLimit ? 'text-red-400 font-bold' : 'text-gray-300'}>
+            <div className="mb-2 flex justify-between text-xs items-baseline">
+                <span className={isOverLimit ? 'text-red-400 font-bold' : 'text-gray-200 font-medium'}>
                     {formatFileSize(usedBytes)}
                 </span>
-                <span className="text-gray-500">
-                    of {formatFileSize(totalLimit)}
+                <span className="text-gray-500 text-[11px]">
+                    &nbsp;of {formatFileSize(totalLimit)}
                 </span>
             </div>
 
-            {/* Progress Bar */}
-            <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-3">
+            {/* Progress Bar - Thicker & Premium */}
+            <div className="h-3 bg-white/5 rounded-full overflow-hidden mb-4 ring-1 ring-white/5">
                 <div
-                    className={`h-full rounded-full transition-all duration-500 ${isOverLimit ? 'bg-red-500' :
-                        percent > 80 ? 'bg-orange-500' : 'bg-green-500'
+                    className={`h-full rounded-full transition-all duration-500 ${isOverLimit ? 'bg-gradient-to-r from-red-500 to-red-600' :
+                        percent > 80 ? 'bg-gradient-to-r from-orange-500 to-orange-600' : 'bg-gradient-to-r from-emerald-500 to-emerald-400'
                         }`}
                     style={{ width: `${percent}%` }}
                 />
             </div>
 
             {/* Breakdown */}
-            <div className="space-y-1">
-                <div className="flex justify-between text-[10px] text-gray-500" title="Fixed quota provided to all users.">
+            <div className="space-y-2">
+                <div className="flex justify-between text-[11px] text-gray-400" title="Fixed quota provided to all users.">
                     <span>Base Plan</span>
-                    <span>{formatFileSize(baseLimit)}</span>
+                    <span className="font-mono text-gray-300">{formatFileSize(baseLimit)}</span>
                 </div>
                 <div
-                    className={`flex justify-between text-[10px] transition-colors cursor-help ${isOffline ? 'text-red-400/60 line-through decoration-red-400/50' : 'text-purple-400'
+                    className={`flex justify-between text-[11px] transition-colors cursor-help ${isOffline ? 'text-red-400/60 line-through decoration-red-400/50' : 'text-purple-400'
                         }`}
                     title={isOffline
                         ? "Earned storage is unavailable because your node is Offline. Go Online to restore it."
                         : "Bonus storage earned by keeping your node online and contributing to the network."}
                 >
                     <span className="flex items-center gap-1">
-                        Earned {isOffline && '(Node Offline)'}
+                        Earned {isOffline && '(Offline)'}
                     </span>
-                    <span>+{formatFileSize(earnedLimit)}</span>
+                    <span className="font-mono">+{formatFileSize(earnedLimit)}</span>
                 </div>
             </div>
 
             {isOverLimit && (
-                <div className="mt-2 text-[10px] text-red-400 bg-red-500/10 p-1.5 rounded border border-red-500/20 text-center">
+                <div className="mt-3 text-[10px] text-red-300 bg-red-500/10 p-2 rounded-md border border-red-500/20 text-center font-medium">
                     ⚠️ Storage Limit Exceeded!
                     <br />
                     Bring node online to restore access.
