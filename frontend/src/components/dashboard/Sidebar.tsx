@@ -52,7 +52,7 @@ export function Sidebar({
                         <span className="sidebar-label">Network Info</span>
                     </button>
                     <button
-                        className={`sidebar - item ${activeSection === 'my-files' ? 'active' : ''} `}
+                        className={`sidebar-item ${activeSection === 'my-files' ? 'active' : ''} `}
                         onClick={() => {
                             onSectionChange('my-files');
                             onFolderSelect?.(null);
@@ -62,7 +62,7 @@ export function Sidebar({
                         <span className="sidebar-label">My Files</span>
                     </button>
                     <button
-                        className={`sidebar - item ${activeSection === 'shared' ? 'active' : ''} `}
+                        className={`sidebar-item ${activeSection === 'shared' ? 'active' : ''} `}
                         onClick={() => onSectionChange('shared')}
                     >
                         <span className="sidebar-icon">👥</span>
@@ -80,7 +80,7 @@ export function Sidebar({
                             {pinnedFolders.map(folder => (
                                 <button
                                     key={folder.id}
-                                    className={`sidebar - item ${currentFolderId === folder.id ? 'active' : ''} `}
+                                    className={`sidebar-item ${currentFolderId === folder.id ? 'active' : ''} `}
                                     onClick={() => {
                                         onSectionChange('my-files');
                                         onFolderSelect?.(folder.id);
@@ -103,7 +103,7 @@ export function Sidebar({
                             {starredFiles.filter(f => f.mimeType !== 'application/folder').map(file => (
                                 <button
                                     key={file.id}
-                                    className={`sidebar - item`}
+                                    className={`sidebar-item`}
                                     onClick={() => onSectionChange('starred')}
                                 >
                                     <span className="sidebar-icon">📄</span>
@@ -117,14 +117,14 @@ export function Sidebar({
 
                 <div className="sidebar-group">
                     <button
-                        className={`sidebar - item ${activeSection === 'recent' ? 'active' : ''} `}
+                        className={`sidebar-item ${activeSection === 'recent' ? 'active' : ''} `}
                         onClick={() => onSectionChange('recent')}
                     >
                         <span className="sidebar-icon">🕐</span>
                         <span className="sidebar-label">Recent</span>
                     </button>
                     <button
-                        className={`sidebar - item ${activeSection === 'starred' ? 'active' : ''} `}
+                        className={`sidebar-item ${activeSection === 'starred' ? 'active' : ''} `}
                         onClick={() => onSectionChange('starred')}
                     >
                         <span className="sidebar-icon">⭐</span>
@@ -136,7 +136,7 @@ export function Sidebar({
 
                 <div className="sidebar-group">
                     <button
-                        className={`sidebar - item ${activeSection === 'trash' ? 'active' : ''} `}
+                        className={`sidebar-item ${activeSection === 'trash' ? 'active' : ''} `}
                         onClick={() => onSectionChange('trash')}
                     >
                         <span className="sidebar-icon">🗑️</span>
@@ -149,7 +149,7 @@ export function Sidebar({
                 <StoragePanel {...storageProps} />
                 <div className="pb-4 text-[9px] text-center text-gray-700 font-mono select-none tracking-widest uppercase opacity-50 flex flex-col gap-1">
                     <span>Prototype Simulation</span>
-                    <span className="text-[8px] opacity-70">v0.1.2 (Premium)</span>
+                    <span className="text-[8px] opacity-70">v0.1.3 (Fix-Layout)</span>
                 </div>
             </div>
 
