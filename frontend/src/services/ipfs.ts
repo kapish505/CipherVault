@@ -24,27 +24,19 @@
  */
 
 // Backend API URL
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// Pinata API JWT (Client-side)
+const PINATA_JWT = import.meta.env.VITE_PINATA_JWT;
 
-/**
- * Upload encrypted file to IPFS via backend proxy
- * 
- * @param encryptedData - Encrypted file data
- * @param fileName - Original file name (for metadata)
- * @param onProgress - Optional progress callback (0-100)
- * @returns CID (Content Identifier) of uploaded file
- * 
- * Security:
- * - Only encrypted data is sent
- * - Backend never sees plaintext
- * - API token stays server-side
- */
 export async function uploadFile(
     encryptedData: ArrayBuffer,
     fileName: string,
     onProgress?: (progress: number) => void
 ): Promise<string> {
     try {
+        if (!PINATA_JWT) {
+            throw new Error('Pinata JWT not configured in environment variables');
+        }
+
         // Create FormData with encrypted file
         const formData = new FormData();
         const blob = new Blob([encryptedData], { type: 'application/octet-stream' });
@@ -56,24 +48,29 @@ export async function uploadFile(
         // Upload progress tracking
         if (onProgress) onProgress(10);
 
-        // Send to backend API
-        const response = await fetch(`${API_URL}/api/ipfs/upload`, {
+        // Upload directly to Pinata (bypasses Vercel 4.5MB limit)
+        const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
             method: 'POST',
+            headers: {
+                // 'Content-Type': `multipart/form-data; boundary=${formData._boundary}`,
+                // Note: Fetch auto-sets Content-Type with boundary for FormData, do not set manually
+                'Authorization': `Bearer ${PINATA_JWT}`
+            },
             body: formData,
         });
 
         if (onProgress) onProgress(90);
 
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || 'Upload failed');
+            const errorText = await response.text();
+            throw new Error(`Upload failed: ${response.statusText} - ${errorText}`);
         }
 
         const data = await response.json();
 
         if (onProgress) onProgress(100);
 
-        return data.cid;
+        return data.IpfsHash;
     } catch (error) {
         console.error('Failed to upload file to IPFS:', error);
         if (error instanceof Error) {
@@ -114,19 +111,8 @@ export async function downloadFile(cid: string): Promise<ArrayBuffer> {
 
 /**
  * Check if backend IPFS service is configured
+ * Note: Now checks if client-side JWT is available
  */
 export async function isConfigured(): Promise<boolean> {
-    try {
-        const response = await fetch(`${API_URL}/api/ipfs/status`);
-
-        if (!response.ok) {
-            return false;
-        }
-
-        const data = await response.json();
-        return data.configured === true;
-    } catch (error) {
-        console.error('Failed to check IPFS status:', error);
-        return false;
-    }
+    return !!import.meta.env.VITE_PINATA_JWT;
 }
