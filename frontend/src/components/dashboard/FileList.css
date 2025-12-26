@@ -392,101 +392,56 @@
     max-width: 250px;
 }
 
-/* === Custom Action Buttons (Uiverse) === */
-
-/* Download Button (Glassmorphism) */
-.download-button-custom {
-    color: rgba(255, 255, 255, 0.692) !important;
-    padding: 8px 12px;
-    display: flex !important;
-    justify-content: center;
-    align-items: center;
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.397);
-    background: rgba(255, 255, 255, 0.068) !important;
-    overflow: hidden;
-    font-size: 0.9rem;
-    font-weight: 600;
-    gap: 8px;
-    border-radius: 5px;
-    margin: 0 5px;
-    transition: 0.2s;
-    border: 1px solid transparent !important;
-    cursor: pointer;
-}
-
-.download-button-custom:hover:not(:disabled) {
-    border-color: rgba(255, 255, 255, 0.623) !important;
-    background: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0.144),
-            rgba(255, 255, 255, 0.247),
-            rgba(255, 255, 255, 0.39)) !important;
-    box-shadow: 0 6px rgba(255, 255, 255, 0.623) !important;
-    transform: translateY(-6px);
-    color: white !important;
-}
-
-.download-button-custom:active:not(:disabled) {
-    transform: translateY(2px);
-    box-shadow: none !important;
-}
-
-.download-button-custom:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-/* Bin Button (Animated) */
-.bin-button-custom {
-    display: flex !important;
-    flex-direction: column;
+/* === Basic Action Buttons (Clean & Minimal) === */
+.action-btn-basic {
+    flex: 1;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: 35px !important;
-    /* Adjusted size slightly for list context */
-    height: 35px !important;
-    border-radius: 8px !important;
-    /* Slightly smaller radius */
-    background-color: rgb(255, 95, 95) !important;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin: 0 4px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: 16px;
     cursor: pointer;
-    border: 2px solid rgb(255, 201, 201) !important;
-    transition-duration: 0.3s;
-    padding: 0 !important;
-    position: relative;
+    transition: all 0.2s ease;
 }
 
-.bin-bottom {
-    width: 12px;
-    z-index: 2;
-    fill: white;
+.action-btn-basic:hover:not(:disabled) {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
-.bin-top {
-    width: 14px;
-    transform-origin: right;
-    transition-duration: 0.3s;
-    z-index: 2;
-    fill: white;
-    margin-bottom: 1px;
-    /* Gap correction */
+.action-btn-basic:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
 }
 
-.bin-button-custom:hover:not(:disabled) .bin-top {
-    transform: rotate(45deg);
+/* Specific colors for actions */
+.action-btn-basic.download:hover {
+    color: var(--color-accent);
+    background-color: rgba(59, 130, 246, 0.1);
+    /* Blue tint */
+    border-color: rgba(59, 130, 246, 0.2);
 }
 
-.bin-button-custom:hover:not(:disabled) {
-    background-color: rgb(255, 0, 0) !important;
+.action-btn-basic.delete:hover {
+    color: #ef4444;
+    /* Red */
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
 }
 
-.bin-button-custom:active:not(:disabled) {
-    transform: scale(0.9);
-}
-
-.bin-button-custom:disabled {
+.action-btn-basic:disabled {
     opacity: 0.4;
     cursor: not-allowed;
-    background-color: #555 !important;
-    border-color: #777 !important;
 }
 
 .ghost-icon {
