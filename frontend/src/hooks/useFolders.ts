@@ -13,6 +13,7 @@ export interface Folder extends metadata.FolderMetadata {
 
 export function useFolders(walletAddress: string | null) {
     const [folders, setFolders] = useState<metadata.FileMetadata[]>([]);
+    const [starredFiles, setStarredFiles] = useState<metadata.FileMetadata[]>([]);
     const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -20,6 +21,7 @@ export function useFolders(walletAddress: string | null) {
     const loadFolders = useCallback(async () => {
         if (!walletAddress) {
             setFolders([]);
+            setStarredFiles([]);
             return;
         }
 
@@ -27,7 +29,10 @@ export function useFolders(walletAddress: string | null) {
         try {
             const allFiles = await metadata.getFilesByWallet(walletAddress);
             const folderList = allFiles.filter(f => f.mimeType === 'application/folder' && !f.isTrashed);
+            const starred = allFiles.filter(f => f.isStarred && !f.isTrashed);
+
             setFolders(folderList);
+            setStarredFiles(starred);
         } catch (error) {
             console.error('Failed to load folders:', error);
         } finally {
@@ -57,11 +62,17 @@ export function useFolders(walletAddress: string | null) {
     const deleteFolder = useCallback(async (folderId: string) => {
         try {
             await metadata.moveToTrash(folderId);
-            setFolders(prev => prev.filter(f => f.id !== folderId));
+            const allFiles = await metadata.getFilesByWallet(walletAddress!);
+
+            // Re-filter to update both lists
+            setFolders(allFiles.filter(f => f.mimeType === 'application/folder' && !f.isTrashed));
+            setStarredFiles(allFiles.filter(f => f.isStarred && !f.isTrashed));
         } catch (error) {
             console.error('Failed to delete folder:', error);
         }
-    }, []);
+    }, [walletAddress]);
+
+    // ... (getFolderPath and getSubfolders remain unchanged)
 
     const getFolderPath = useCallback((folderId: string | null): metadata.FileMetadata[] => {
         if (!folderId) return [];
@@ -94,6 +105,7 @@ export function useFolders(walletAddress: string | null) {
 
     return {
         folders,
+        starredFiles,
         currentFolderId,
         setCurrentFolderId,
         loading,

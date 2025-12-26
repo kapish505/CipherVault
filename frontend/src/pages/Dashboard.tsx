@@ -28,6 +28,7 @@ type ViewMode = 'list' | 'grid';
 export function Dashboard() {
     const { address, isConnected, connect } = useWallet();
     const {
+        starredFiles,
         currentFolderId,
         setCurrentFolderId,
         getFolderPath,
@@ -204,6 +205,42 @@ export function Dashboard() {
                                     >
                                         <span className="sidebar-icon">📌</span>
                                         <span className="sidebar-label">{folder.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="sidebar-divider"></div>
+                        </>
+                    )}
+
+                    {/* Starred Files Section */}
+                    {starredFiles.length > 0 && (
+                        <>
+                            <div className="sidebar-group-label">Starred Files</div>
+                            <div className="sidebar-group">
+                                {starredFiles.filter(f => f.mimeType !== 'application/folder').map(file => (
+                                    <button
+                                        key={file.id}
+                                        className={`sidebar-item`}
+                                        onClick={() => {
+                                            // TODO: What should happen when clicking a starred file in sidebar?
+                                            // Probably select it or preview it.
+                                            // For now, let's navigate to its folder and select it?
+                                            // Or simplified: select file if we have a way to highlight it.
+                                            // Easier: Just handle it like handleFileSelect from Dashboard if possible,
+                                            // but we don't have direct access here easily without context.
+                                            // Actually, sidebar items usually navigate.
+                                            // If we just want to VIEW them, maybe 'starred' section is enough?
+                                            // User said: "if i star a folder it automatically appears on left sidebar but this doesnt work for a normal file"
+                                            // They likely just want to see it there for quick access.
+                                            // Let's implement basic selection if possible, otherwise just a visual list.
+                                            // But standard sidebar items are usually "filters" or "locations".
+                                            // Individual files in sidebar is unusual unless they are "shortcuts".
+                                            // Let's at least show them.
+                                            setActiveSection('starred');
+                                        }}
+                                    >
+                                        <span className="sidebar-icon">📄</span>
+                                        <span className="sidebar-label">{file.name}</span>
                                     </button>
                                 ))}
                             </div>

@@ -49,6 +49,24 @@ export function FileList({
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
     const [draggedFileId, setDraggedFileId] = useState<string | null>(null);
 
+    // Sort State
+    const [sortConfig, setSortConfig] = useState<{
+        key: 'name' | 'size' | 'uploadedAt' | 'type';
+        direction: 'asc' | 'desc';
+    }>({ key: 'uploadedAt', direction: 'desc' });
+
+    const handleSort = (key: 'name' | 'size' | 'uploadedAt' | 'type') => {
+        setSortConfig(current => ({
+            key,
+            direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc'
+        }));
+    };
+
+    const getSortIcon = (key: string) => {
+        if (sortConfig.key !== key) return '↕';
+        return sortConfig.direction === 'asc' ? '↑' : '↓';
+    };
+
     const handleDragStart = (e: React.DragEvent, file: metadata.FileMetadata) => {
         setDraggedFileId(file.id);
         e.dataTransfer.effectAllowed = 'move';
@@ -126,7 +144,7 @@ export function FileList({
         };
 
         loadFiles();
-    }, [address, isConnected, refreshTrigger]);
+    }, [address, isConnected, refreshTrigger, folderId]); // Added folderId dependency
 
     const filteredFiles = useMemo(() => {
         let result = files;
@@ -141,9 +159,9 @@ export function FileList({
                 break;
             case 'recent':
                 result = result.filter(f => !f.isTrashed);
-                // Sort by accessedAt if available, else uploadedAt
+                // Recent uses accessedAt sort specifically
                 result.sort((a, b) => (b.accessedAt || b.uploadedAt) - (a.accessedAt || a.uploadedAt));
-                break;
+                return result; // Return early for recent to avoid override
             case 'shared':
                 // For now, shared is just a placeholder unless we implement link sharing tracking
                 result = result.filter(f => !f.isTrashed && (f.sharedWith && f.sharedWith.length > 0));
@@ -152,13 +170,6 @@ export function FileList({
             default:
                 // Filter by Folder ID (null for root)
                 result = result.filter(f => !f.isTrashed && (f.folderId === folderId || (!f.folderId && !folderId)));
-                // Standard sort by upload date
-                result.sort((a, b) => {
-                    // Folders first
-                    if (a.mimeType === 'application/folder' && b.mimeType !== 'application/folder') return -1;
-                    if (a.mimeType !== 'application/folder' && b.mimeType === 'application/folder') return 1;
-                    return b.uploadedAt - a.uploadedAt;
-                });
                 break;
         }
 
@@ -174,8 +185,40 @@ export function FileList({
             );
         }
 
+        // 3. Sorting (Dynamic)
+        result.sort((a, b) => {
+            // Always keep folders on top for name/size/date sorts if we want standard File Explorer behavior
+            // Or we can let them sort normally. Standard behavior: Folders first.
+            const isFolderA = a.mimeType === 'application/folder';
+            const isFolderB = b.mimeType === 'application/folder';
+
+            if (isFolderA !== isFolderB) {
+                return isFolderA ? -1 : 1;
+            }
+
+            // Sort implementation
+            let comparison = 0;
+            switch (sortConfig.key) {
+                case 'name':
+                    comparison = a.name.localeCompare(b.name);
+                    break;
+                case 'size':
+                    comparison = a.size - b.size;
+                    break;
+                case 'type':
+                    comparison = a.mimeType.localeCompare(b.mimeType);
+                    break;
+                case 'uploadedAt':
+                default:
+                    comparison = a.uploadedAt - b.uploadedAt;
+                    break;
+            }
+
+            return sortConfig.direction === 'asc' ? comparison : -comparison;
+        });
+
         return result;
-    }, [files, searchQuery, activeSection, folderId]);
+    }, [files, searchQuery, activeSection, folderId, sortConfig]);
 
     const handleDownload = async (file: metadata.FileMetadata) => {
         if (!address) return;
@@ -407,11 +450,19 @@ export function FileList({
             <table className="file-table">
                 <thead>
                     <tr>
-                        <th className="col-name">Name</th>
+                        <th className="col-name" onClick={() => handleSort('name')}>
+                            Name {getSortIcon('name')}
+                        </th>
                         <th className="col-classification">Classification</th>
-                        <th className="col-type">Type</th>
-                        <th className="col-size">Size</th>
-                        <th className="col-modified">Modified</th>
+                        <th className="col-type" onClick={() => handleSort('type')}>
+                            Type {getSortIcon('type')}
+                        </th>
+                        <th className="col-size" onClick={() => handleSort('size')}>
+                            Size {getSortIcon('size')}
+                        </th>
+                        <th className="col-modified" onClick={() => handleSort('uploadedAt')}>
+                            Modified {getSortIcon('uploadedAt')}
+                        </th>
                         <th className="col-replica">Replicas</th>
                         <th className="col-status">Status</th>
                         <th className="col-actions"></th>
