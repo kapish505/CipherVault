@@ -623,7 +623,7 @@ export function FileList({
                             <td className="col-actions">
                                 <div className="file-actions">
                                     <button
-                                        className="action-btn-icon"
+                                        className="download-button-custom"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDownload(file);
@@ -631,8 +631,45 @@ export function FileList({
                                         disabled={downloadingId === file.id}
                                         title="Download and decrypt"
                                     >
-                                        {downloadingId === file.id ? '⟳' : '⬇️'}
+                                        {downloadingId === file.id ? '⟳' : '⬇'}
                                     </button>
+
+                                    {/* Trash / Delete Button (Always Visible) */}
+                                    <button
+                                        className="bin-button-custom"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(file);
+                                        }}
+                                        disabled={downloadingId === file.id}
+                                        title={activeSection === 'trash' ? 'Delete Forever' : 'Move to Trash'}
+                                    >
+                                        <svg
+                                            className="bin-top"
+                                            viewBox="0 0 39 12"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M12 2C12 0.895431 12.8954 0 14 0H25C26.1046 0 27 0.895431 27 2V4H12V2Z"
+                                                fill="white"
+                                            />
+                                            <path d="M0 4H39V6H0V4Z" fill="white" />
+                                        </svg>
+                                        <svg
+                                            className="bin-bottom"
+                                            viewBox="0 0 33 39"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M4 0H29L26 39H7L4 0Z"
+                                                fill="white"
+                                            />
+                                        </svg>
+                                    </button>
+
+                                    {/* Restore Button (Keep separate if needed, or integrate?) */}
                                     {activeSection === 'trash' && (
                                         <button
                                             className="action-btn-icon"
@@ -641,21 +678,11 @@ export function FileList({
                                                 handleRestore(file);
                                             }}
                                             title="Restore file"
+                                            style={{ marginLeft: '4px' }}
                                         >
                                             ♻️
                                         </button>
                                     )}
-                                    <button
-                                        className="action-btn-icon action-delete"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDelete(file);
-                                        }}
-                                        disabled={downloadingId === file.id}
-                                        title={activeSection === 'trash' ? 'Delete Forever' : 'Move to Trash'}
-                                    >
-                                        🗑️
-                                    </button>
                                 </div>
                             </td>
                         </tr>

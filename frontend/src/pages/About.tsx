@@ -124,10 +124,10 @@ export function About() {
                             </p>
                         </div>
                         <div className="architecture-item">
-                            <h3>Community Nodes</h3>
+                            <h3>Participation-Based Nodes</h3>
                             <p>
-                                Storage nodes run by community members store encrypted file replicas and report
-                                health status to the network.
+                                Community nodes earn trust and credits by proving storage reliability. This
+                                x402-based participation model ensures a robust and distributed network.
                             </p>
                         </div>
                         <div className="architecture-item">

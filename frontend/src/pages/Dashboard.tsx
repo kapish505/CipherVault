@@ -26,7 +26,7 @@ import { isFirebaseConfigured } from '@/config/firebase';
 import { formatFileSize, formatDate } from '@/utils/format';
 import './Dashboard.css';
 
-type SidebarSection = 'my-files' | 'shared' | 'recent' | 'starred' | 'trash';
+type SidebarSection = 'my-files' | 'recent' | 'starred' | 'trash';
 type ViewMode = 'list' | 'grid';
 
 export function Dashboard() {
@@ -140,7 +140,8 @@ export function Dashboard() {
                 setSyncStatus({ loading: false, lastSynced: Date.now(), error: null });
             } catch (err) {
                 console.error('Auto-save failed', err);
-                setSyncStatus(prev => ({ ...prev, loading: false, error: 'Sync failed' }));
+                const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+                setSyncStatus(prev => ({ ...prev, loading: false, error: errorMessage }));
             }
         }, 2000); // 2s debounce
 
@@ -271,38 +272,6 @@ export function Dashboard() {
             }
         });
         setDialogOpen(true);
-    };
-
-    const handleShare = () => {
-        if (selectedFile) {
-            setDialogConfig({
-                title: 'File Shared Successfully',
-                description: `Link generated! ${selectedFile.name} is now available in your Shared folder.`,
-                variant: 'alert',
-                onConfirm: () => {
-                    metadata.shareFile(selectedFile.id).then(() => {
-                        setRefreshTrigger(prev => prev + 1);
-                        setDialogOpen(false);
-                    });
-                }
-            });
-            // Optimization: Call the share function immediately or changing logic to "Confirm Share" if desired.
-            // Based on previous code: alert came AFTER sharing? 
-            // Previous code: await share; alert();
-            // Let's adapt:
-
-            metadata.shareFile(selectedFile.id).then(() => {
-                // Show success dialog
-                setDialogConfig({
-                    title: 'File Shared',
-                    description: `${selectedFile.name} has been shared successfully.`,
-                    variant: 'alert',
-                    onConfirm: () => setDialogOpen(false)
-                });
-                setDialogOpen(true);
-                setRefreshTrigger(prev => prev + 1);
-            });
-        }
     };
 
     const pinnedFolders = getPinnedFolders();
@@ -497,10 +466,6 @@ export function Dashboard() {
                         </div>
 
                         <div className="context-actions">
-                            <button className="context-action-btn" onClick={handleShare}>
-                                <span className="btn-icon">🔗</span>
-                                Share File
-                            </button>
                             <button
                                 className="context-action-btn"
                                 onClick={() => metadata.toggleStar(selectedFile.id).then(() => {

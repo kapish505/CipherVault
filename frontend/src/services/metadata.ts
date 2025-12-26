@@ -317,20 +317,6 @@ export async function createFolder(name: string, walletAddress: string, parentId
 
 
 /**
- * Share a file (Simulate by setting sharedWith)
- */
-export async function shareFile(id: string): Promise<void> {
-    const file = await getFileById(id);
-    if (!file) return;
-
-    if (!file.sharedWith) file.sharedWith = [];
-    if (!file.sharedWith.includes('public')) {
-        file.sharedWith.push('public');
-    }
-    await saveFileMetadata(file);
-}
-
-/**
  * Clear all files for a wallet (used on disconnect)
  */
 export async function clearWalletFiles(walletAddress: string): Promise<void> {

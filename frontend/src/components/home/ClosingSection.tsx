@@ -15,9 +15,14 @@ export function ClosingSection() {
                 <h2 className="closing-statement">
                     You own your files. Always.
                 </h2>
-                <Link to="/app" className="btn btn-primary-large">
-                    Start Encrypting
-                </Link>
+                <div className="closing-actions">
+                    <Link to="/app" className="btn btn-primary-large">
+                        Launch App
+                    </Link>
+                    <Link to="/about" className="btn btn-secondary-large">
+                        Learn More →
+                    </Link>
+                </div>
             </div>
         </section>
     );

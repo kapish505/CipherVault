@@ -31,9 +31,9 @@ export function Hero() {
                         opacity: opacity,
                     }}
                 >
-                    Your files, encrypted.
+                    Decentralized Storage.
                     <br />
-                    Your keys, your control.
+                    Replication & Self-Healing.
                 </h1>
 
                 <p
@@ -42,9 +42,9 @@ export function Hero() {
                         opacity: Math.max(0, opacity - 0.1),
                     }}
                 >
-                    Zero-knowledge cloud storage powered by client-side encryption and IPFS.
+                    Experience the future of participation-based storage.
                     <br />
-                    No servers can read your data. Ever.
+                    Resilient, encrypted, and distributed across the network.
                 </p>
             </div>
         </section>

@@ -392,6 +392,103 @@
     max-width: 250px;
 }
 
+/* === Custom Action Buttons (Uiverse) === */
+
+/* Download Button (Glassmorphism) */
+.download-button-custom {
+    color: rgba(255, 255, 255, 0.692) !important;
+    padding: 8px 12px;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.397);
+    background: rgba(255, 255, 255, 0.068) !important;
+    overflow: hidden;
+    font-size: 0.9rem;
+    font-weight: 600;
+    gap: 8px;
+    border-radius: 5px;
+    margin: 0 5px;
+    transition: 0.2s;
+    border: 1px solid transparent !important;
+    cursor: pointer;
+}
+
+.download-button-custom:hover:not(:disabled) {
+    border-color: rgba(255, 255, 255, 0.623) !important;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.144),
+            rgba(255, 255, 255, 0.247),
+            rgba(255, 255, 255, 0.39)) !important;
+    box-shadow: 0 6px rgba(255, 255, 255, 0.623) !important;
+    transform: translateY(-6px);
+    color: white !important;
+}
+
+.download-button-custom:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: none !important;
+}
+
+.download-button-custom:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Bin Button (Animated) */
+.bin-button-custom {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 35px !important;
+    /* Adjusted size slightly for list context */
+    height: 35px !important;
+    border-radius: 8px !important;
+    /* Slightly smaller radius */
+    background-color: rgb(255, 95, 95) !important;
+    cursor: pointer;
+    border: 2px solid rgb(255, 201, 201) !important;
+    transition-duration: 0.3s;
+    padding: 0 !important;
+    position: relative;
+}
+
+.bin-bottom {
+    width: 12px;
+    z-index: 2;
+    fill: white;
+}
+
+.bin-top {
+    width: 14px;
+    transform-origin: right;
+    transition-duration: 0.3s;
+    z-index: 2;
+    fill: white;
+    margin-bottom: 1px;
+    /* Gap correction */
+}
+
+.bin-button-custom:hover:not(:disabled) .bin-top {
+    transform: rotate(45deg);
+}
+
+.bin-button-custom:hover:not(:disabled) {
+    background-color: rgb(255, 0, 0) !important;
+}
+
+.bin-button-custom:active:not(:disabled) {
+    transform: scale(0.9);
+}
+
+.bin-button-custom:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: #555 !important;
+    border-color: #777 !important;
+}
+
 .ghost-icon {
     font-size: 18px;
 }

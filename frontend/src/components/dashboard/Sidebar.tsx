@@ -3,7 +3,7 @@ import { StoragePanel } from './StoragePanel';
 import { NodeStatus } from '@/hooks/useStorage';
 import { NetworkInfoPanel } from './NetworkInfoPanel';
 
-export type SidebarSection = 'my-files' | 'shared' | 'recent' | 'starred' | 'trash';
+export type SidebarSection = 'my-files' | 'recent' | 'starred' | 'trash';
 
 interface SidebarProps {
     activeSection: SidebarSection;
@@ -60,13 +60,6 @@ export function Sidebar({
                     >
                         <span className="sidebar-icon">📁</span>
                         <span className="sidebar-label">My Files</span>
-                    </button>
-                    <button
-                        className={`sidebar-item ${activeSection === 'shared' ? 'active' : ''} `}
-                        onClick={() => onSectionChange('shared')}
-                    >
-                        <span className="sidebar-icon">👥</span>
-                        <span className="sidebar-label">Shared</span>
                     </button>
                 </div>
 

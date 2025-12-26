@@ -116,6 +116,15 @@ export function NetworkInfoPanel({ isOpen, onClose }: NetworkInfoPanelProps) {
                         </div>
                     </div>
 
+                    {/* x402 vs IPFS explanation */}
+                    <div className="bg-black/40 rounded-lg p-4 border border-white/5">
+                        <h3 className="text-sm font-medium text-white">x402 Coordination Protocol</h3>
+                        <p className="text-xs text-gray-400 mt-1">
+                            <strong>Control Plane (x402):</strong> Handles node discovery, health checks, and storage negotiation. <br />
+                            <strong>Data Plane (IPFS):</strong> The actual encrypted file chunks are transferred via the IPFS content-addressable network.
+                        </p>
+                    </div>
+
                     {/* Legend */}
                     <div className="grid grid-cols-3 gap-2 text-[10px] text-gray-500 border-t border-white/5 pt-4">
                         <div className="flex items-center gap-1">
