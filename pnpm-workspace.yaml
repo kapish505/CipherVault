@@ -1,0 +1,11 @@
+packages:
+  - frontend
+  - backend
+  - extension
+  - shared
+  - node
+  - p2p
+  - contracts
+
+onlyBuiltDependencies:
+  - better-sqlite3

@@ -1,0 +1,108 @@
+/**
+ * Classification Selector Styles
+ */
+
+.classification-selector {
+    margin-bottom: var(--space-4);
+}
+
+.selector-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.info-btn {
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.15s ease;
+    padding: 0;
+}
+
+.info-btn:hover {
+    opacity: 1;
+}
+
+.classification-select {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.classification-select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.classification-info {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.close-info {
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
+}
+
+.close-info:hover {
+    color: var(--color-text-primary);
+}
+
+.info-item {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+}
+
+.info-icon {
+    font-size: 16px;
+}
+
+.info-title {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+}
+
+.info-desc {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.info-footer {
+    margin-top: var(--space-3);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}

@@ -1,0 +1,319 @@
+/**
+ * Upload Manager Styles - Premium Bottom Panel
+ */
+
+.upload-manager {
+    position: fixed;
+    bottom: 0;
+    right: var(--space-6);
+    width: 420px;
+    max-height: 600px;
+    background: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-bottom: none;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.upload-manager.collapsed .upload-manager-content {
+    display: none;
+}
+
+/* Header */
+.upload-manager-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.upload-manager-header:hover {
+    background: var(--color-bg-secondary);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1;
+}
+
+.header-icon {
+    font-size: 20px;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.header-text strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.header-count {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.btn-clear {
+    padding: var(--space-1) var(--space-3);
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-clear:hover {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+}
+
+.btn-toggle {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    padding: var(--space-1);
+    transition: color 0.15s ease;
+}
+
+.btn-toggle:hover {
+    color: var(--color-text-primary);
+}
+
+/* Content */
+.upload-manager-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-3);
+    max-height: 500px;
+}
+
+/* Upload Task */
+.upload-task {
+    padding: var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-3);
+    transition: all 0.2s ease;
+}
+
+.upload-task:last-child {
+    margin-bottom: 0;
+}
+
+.upload-task:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-task-completed {
+    background-color: rgba(16, 185, 129, 0.05);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.upload-task-failed {
+    background-color: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Task Header */
+.task-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.task-info {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    flex: 1;
+    min-width: 0;
+}
+
+.task-status-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.task-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.task-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 4px;
+}
+
+.task-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.task-separator {
+    opacity: 0.5;
+}
+
+.task-size {
+    font-weight: 500;
+}
+
+.task-status {
+    font-weight: 500;
+}
+
+.task-classification {
+    text-transform: capitalize;
+    font-weight: 500;
+}
+
+/* Task Actions */
+.task-actions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.btn-retry,
+.btn-remove {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--color-text-secondary);
+}
+
+.btn-retry:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+.btn-remove:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+/* Progress Bar */
+.task-progress {
+    margin-top: var(--space-2);
+    height: 4px;
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 0.3s ease;
+    background: linear-gradient(90deg, currentColor 0%, currentColor 100%);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        opacity: 0.8;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.8;
+    }
+}
+
+/* Error Message */
+.task-error {
+    margin-top: var(--space-2);
+    padding: var(--space-2);
+    background-color: rgba(239, 68, 68, 0.1);
+    border-radius: var(--radius-md);
+    font-size: 12px;
+    color: #ef4444;
+}
+
+/* Scrollbar */
+.upload-manager-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.upload-manager-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.upload-manager-content::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+}
+
+.upload-manager-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-tertiary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .upload-manager {
+        right: 0;
+        left: 0;
+        width: 100%;
+        border-radius: 0;
+    }
+}

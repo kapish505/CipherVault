@@ -1,0 +1,43 @@
+/**
+ * Classification Badge Styles
+ */
+
+.classification-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px var(--space-2);
+    border: 1px solid;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 500;
+    background-color: var(--color-bg-secondary);
+    transition: all 0.15s ease;
+}
+
+.classification-icon {
+    font-size: 12px;
+    line-height: 1;
+}
+
+.classification-label {
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.classification-public {
+    color: #10b981;
+}
+
+.classification-private {
+    color: #3b82f6;
+}
+
+.classification-confidential {
+    color: #ef4444;
+}
+
+.classification-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

@@ -1,0 +1,99 @@
+/**
+ * Storage Choice Styles
+ */
+
+.storage-choice {
+    padding: var(--space-24) var(--space-6);
+    background-color: var(--color-bg-primary);
+}
+
+.storage-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.storage-title {
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-16);
+    text-align: center;
+}
+
+.storage-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-8);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.storage-options.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.storage-option {
+    padding: var(--space-8);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+}
+
+.storage-option:hover {
+    border-color: var(--color-text-tertiary);
+    transform: translateY(-4px);
+}
+
+.option-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.option-icon {
+    font-size: 32px;
+}
+
+.option-title {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    color: var(--color-text-primary);
+}
+
+.option-description {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-4);
+}
+
+.option-status {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .storage-choice {
+        padding: var(--space-20) var(--space-4);
+    }
+
+    .storage-title {
+        font-size: 36px;
+    }
+
+    .storage-options {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+    }
+}

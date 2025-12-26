@@ -1,0 +1,368 @@
+/**
+ * File List Styles - Premium Polish
+ * 
+ * Improvements:
+ * - Better information density
+ * - Improved status indicators
+ * - Subtle hover states
+ * - Selection support
+ */
+
+/* Loading */
+.file-list-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-16);
+    gap: var(--space-4);
+}
+
+.spinner-large {
+    width: 28px;
+    height: 28px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.file-list-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-20);
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 56px;
+    margin-bottom: var(--space-6);
+    opacity: 0.2;
+}
+
+.file-list-empty h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 var(--space-2);
+    color: var(--color-text-primary);
+}
+
+.file-list-empty p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-2);
+}
+
+.empty-hint {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    max-width: 400px;
+}
+
+/* ===== TABLE VIEW (Improved Density) ===== */
+.file-table-container {
+    overflow-x: auto;
+}
+
+.file-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.file-table thead {
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    background-color: var(--color-bg-primary);
+    z-index: 1;
+}
+
+.file-table th {
+    text-align: left;
+    padding: var(--space-2) var(--space-4);
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.file-table tbody tr {
+    border-bottom: 1px solid var(--color-border);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.file-table tbody tr:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.file-table tbody tr.selected {
+    background-color: rgba(37, 99, 235, 0.08);
+    border-color: rgba(37, 99, 235, 0.2);
+}
+
+.file-table tbody tr.downloading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.file-table tbody tr:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+}
+
+.file-table td {
+    padding: var(--space-2) var(--space-4);
+    color: var(--color-text-primary);
+}
+
+/* Columns */
+.col-name {
+    width: 40%;
+}
+
+.col-type {
+    width: 10%;
+}
+
+.col-size {
+    width: 10%;
+}
+
+.col-modified {
+    width: 15%;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+}
+
+.col-status {
+    width: 15%;
+}
+
+.col-actions {
+    width: 10%;
+    text-align: right;
+}
+
+/* File Name Cell */
+.file-name-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.file-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.file-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.file-type {
+    text-transform: capitalize;
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+}
+
+/* Status Badges (Improved) */
+.status-badges {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 3px var(--space-2);
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.status-encrypted {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+[data-theme="dark"] .status-encrypted {
+    background-color: rgba(16, 185, 129, 0.15);
+}
+
+.badge-icon {
+    font-size: 10px;
+}
+
+.badge-text {
+    font-weight: 500;
+}
+
+/* Actions */
+.file-actions {
+    display: flex;
+    gap: var(--space-1);
+    justify-content: flex-end;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.file-table tbody tr:hover .file-actions,
+.file-table tbody tr.selected .file-actions {
+    opacity: 1;
+}
+
+.action-btn-icon {
+    padding: var(--space-1);
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s ease;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+}
+
+.action-btn-icon:hover:not(:disabled) {
+    background-color: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+.action-btn-icon.action-delete:hover:not(:disabled) {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.action-btn-icon:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ===== GRID VIEW ===== */
+.file-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3);
+}
+
+.file-grid-item {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+
+.file-grid-item:hover {
+    border-color: var(--color-text-tertiary);
+    background-color: var(--color-bg-secondary);
+}
+
+.file-grid-preview {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+}
+
+.file-type-icon-large {
+    font-size: 40px;
+    opacity: 0.5;
+}
+
+.file-grid-name {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: var(--space-1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-grid-meta {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--space-2);
+}
+
+.file-grid-actions {
+    display: flex;
+    gap: var(--space-1);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.file-grid-item:hover .file-grid-actions {
+    opacity: 1;
+}
+
+.action-btn-small {
+    flex: 1;
+    padding: var(--space-1);
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.action-btn-small:hover:not(:disabled) {
+    background-color: var(--color-bg-tertiary);
+}
+
+.action-btn-small:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .file-table {
+        font-size: 12px;
+    }
+
+    .file-table th,
+    .file-table td {
+        padding: var(--space-2);
+    }
+
+    .col-type,
+    .col-status {
+        display: none;
+    }
+
+    .file-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: var(--space-2);
+    }
+
+    .file-actions {
+        opacity: 1;
+    }
+}

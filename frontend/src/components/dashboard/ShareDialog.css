@@ -1,0 +1,188 @@
+/**
+ * Share Dialog Styles
+ */
+
+.share-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.15s ease;
+}
+
+.share-dialog {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 500px;
+    animation: modalSlide 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlide {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.share-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.share-dialog-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.dialog-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    padding: var(--space-2);
+    transition: color 0.15s ease;
+}
+
+.dialog-close:hover {
+    color: var(--color-text-primary);
+}
+
+.share-dialog-content {
+    padding: var(--space-5);
+}
+
+.share-file-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-5);
+}
+
+.file-icon-large {
+    font-size: 32px;
+}
+
+.share-file-name {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.share-file-meta {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+}
+
+.share-form {
+    margin-bottom: var(--space-5);
+}
+
+.share-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.share-input {
+    width: 100%;
+    padding: var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    transition: all 0.15s ease;
+}
+
+.share-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-primary);
+}
+
+.share-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.share-error {
+    margin-top: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-sm);
+    color: #ef4444;
+    font-size: 13px;
+}
+
+.share-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+.btn {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-secondary {
+    background: none;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-bg-secondary);
+}
+
+.btn-primary {
+    background-color: var(--color-accent);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -1,0 +1,26 @@
+{
+  "name": "ciphervault",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Decentralized, user-owned cloud storage with encrypted IPFS storage and self-healing replication",
+  "scripts": {
+    "dev": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "type-check": "pnpm -r type-check",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "keywords": [
+    "decentralized",
+    "storage",
+    "ipfs",
+    "encryption",
+    "web3"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

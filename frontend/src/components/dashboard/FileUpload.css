@@ -1,0 +1,401 @@
+/**
+ * File Upload Styles - Premium Design
+ */
+
+.file-upload-premium {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-2);
+}
+
+/* Header */
+.upload-header {
+    text-align: center;
+    margin-bottom: var(--space-2);
+}
+
+.upload-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.upload-subtitle {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.upload-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background-color: rgba(99, 102, 241, 0.1);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    color: var(--color-accent);
+    font-weight: 500;
+}
+
+.status-icon {
+    font-size: 14px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Upload Info Note */
+.upload-info-note {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-lg);
+}
+
+.info-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.info-content {
+    flex: 1;
+}
+
+.info-content strong {
+    display: block;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.info-content p {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Classification Grid */
+.classification-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+}
+
+.classification-card {
+    padding: var(--space-4);
+    border: 2px solid;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.classification-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.classification-card.active {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.classification-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.classification-card-icon {
+    font-size: 24px;
+}
+
+.classification-card-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.classification-card-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Classification Details */
+.classification-details {
+    padding: var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-left: 4px solid;
+    border-radius: var(--radius-md);
+}
+
+.details-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+    font-size: 16px;
+    color: var(--color-text-primary);
+}
+
+.details-icon {
+    font-size: 20px;
+}
+
+.details-text {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-3);
+    line-height: 1.6;
+}
+
+.details-examples {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+}
+
+.details-examples strong {
+    color: var(--color-text-secondary);
+}
+
+/* Upload Dropzone */
+.upload-dropzone-premium {
+    padding: var(--space-8);
+    border: 3px dashed var(--color-border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.upload-dropzone-premium.dragging {
+    border-color: var(--color-accent);
+    background: linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-secondary) 100%);
+    transform: scale(1.02);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.dropzone-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-4);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.dropzone-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.dropzone-subtitle {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    margin: 0 0 var(--space-6);
+}
+
+/* Upload Actions */
+.upload-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    margin-bottom: var(--space-6);
+}
+
+.upload-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.upload-btn-primary {
+    background: linear-gradient(135deg, var(--color-accent) 0%, #6366f1 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.upload-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+.upload-btn-secondary {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    border: 2px solid var(--color-border);
+}
+
+.upload-btn-secondary:hover {
+    background-color: var(--color-bg-secondary);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+}
+
+.btn-icon {
+    font-size: 18px;
+}
+
+/* Upload Features */
+.upload-features {
+    display: flex;
+    gap: var(--space-6);
+    justify-content: center;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.feature-icon {
+    font-size: 16px;
+}
+
+/* Selected Files */
+.selected-files {
+    padding: var(--space-4);
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+}
+
+.selected-files h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-3);
+}
+
+.files-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+}
+
+.file-icon {
+    font-size: 16px;
+}
+
+.file-name {
+    flex: 1;
+    color: var(--color-text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+}
+
+.file-item-more {
+    padding: var(--space-2);
+    text-align: center;
+    color: var(--color-text-tertiary);
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Placeholder */
+.file-upload-placeholder {
+    text-align: center;
+    padding: var(--space-16);
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg-tertiary) 100%);
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-xl);
+}
+
+.placeholder-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-4);
+}
+
+.file-upload-placeholder h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-2);
+}
+
+.file-upload-placeholder p {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .classification-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-actions {
+        flex-direction: column;
+    }
+
+    .upload-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .upload-features {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+}

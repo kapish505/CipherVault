@@ -1,0 +1,64 @@
+/**
+ * Closing Section Styles
+ */
+
+.closing-section {
+    padding: var(--space-24) var(--space-6);
+    background-color: var(--color-bg-secondary);
+}
+
+.closing-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.closing-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.closing-statement {
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-10);
+    line-height: 1.1;
+}
+
+.btn-primary-large {
+    padding: var(--space-4) var(--space-8);
+    background-color: var(--color-accent);
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.btn-primary-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .closing-section {
+        padding: var(--space-20) var(--space-4);
+    }
+
+    .closing-statement {
+        font-size: 36px;
+    }
+
+    .btn-primary-large {
+        font-size: 16px;
+        padding: var(--space-3) var(--space-6);
+    }
+}

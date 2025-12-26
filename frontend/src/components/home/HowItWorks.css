@@ -1,0 +1,144 @@
+/**
+ * How It Works Styles - With Visuals
+ */
+
+.how-it-works {
+    padding: var(--space-24) var(--space-6);
+    background-color: var(--color-bg-primary);
+}
+
+.how-it-works-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 48px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-16);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.section-title.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-20);
+}
+
+.step {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.step-right {
+    direction: rtl;
+}
+
+.step-right .step-content {
+    direction: ltr;
+}
+
+.step-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.step-number {
+    font-size: 72px;
+    font-weight: 700;
+    color: var(--color-text-tertiary);
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    opacity: 0.2;
+    line-height: 1;
+}
+
+.step-title {
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.step-description {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+.step-visual-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+}
+
+.step-visual {
+    color: var(--color-text-primary);
+    opacity: 0.7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .how-it-works {
+        padding: var(--space-20) var(--space-4);
+    }
+
+    .section-title {
+        font-size: 36px;
+    }
+
+    .step {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+    }
+
+    .step-right {
+        direction: ltr;
+    }
+
+    .step-number {
+        font-size: 56px;
+    }
+
+    .step-title {
+        font-size: 24px;
+    }
+
+    .step-description {
+        font-size: 16px;
+    }
+
+    .steps-list {
+        gap: var(--space-16);
+    }
+
+    .step-visual-container {
+        order: -1;
+    }
+}

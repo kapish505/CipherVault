@@ -1,0 +1,252 @@
+/**
+ * Wallet Switcher Styles - Gmail-inspired
+ */
+
+.wallet-switcher {
+    position: relative;
+}
+
+.wallet-connect-btn {
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wallet-connect-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.wallet-switcher-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.wallet-switcher-trigger:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-text-tertiary);
+}
+
+.wallet-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.wallet-address-short {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+}
+
+.dropdown-arrow {
+    font-size: 10px;
+    color: var(--color-text-tertiary);
+    margin-left: var(--space-1);
+}
+
+/* Dropdown */
+.wallet-dropdown {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    width: 320px;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    animation: dropdownSlide 0.15s ease;
+}
+
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    padding: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.dropdown-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+/* Accounts List */
+.accounts-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    position: relative;
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+.account-item.active {
+    background-color: var(--color-bg-secondary);
+}
+
+.account-button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    text-align: left;
+}
+
+.account-button:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.account-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.account-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.account-address {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+}
+
+.account-status {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-top: 2px;
+}
+
+.check-icon {
+    color: #10b981;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.remove-account {
+    padding: var(--space-2);
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.15s ease;
+}
+
+.account-item:hover .remove-account {
+    opacity: 1;
+}
+
+.remove-account:hover {
+    color: #ef4444;
+}
+
+/* Dropdown Actions */
+.dropdown-actions {
+    padding: var(--space-3);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.add-account-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.add-account-btn:hover {
+    background-color: var(--color-bg-tertiary);
+    border-color: var(--color-accent);
+}
+
+.add-icon {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.disconnect-btn {
+    padding: var(--space-2) var(--space-3);
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.disconnect-btn:hover {
+    background-color: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+    color: #ef4444;
+}

@@ -1,0 +1,60 @@
+/**
+ * Replica Status Styles
+ */
+
+.replica-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 12px;
+}
+
+.replica-count {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px var(--space-2);
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+.replica-icon {
+    font-size: 14px;
+}
+
+.replica-number {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.health-badge {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    font-size: 11px;
+}
+
+.health-healthy {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.health-degraded {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.prototype-label {
+    padding: 2px var(--space-1);
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
