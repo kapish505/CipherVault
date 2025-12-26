@@ -4,6 +4,7 @@
  * Global top navigation - always visible, clear hierarchy
  */
 
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletSwitcher } from '@/components/shared/WalletSwitcher';
 import { ThemeToggle } from '@/components/shared/ThemeToggle';
@@ -11,6 +12,17 @@ import './Navbar.css';
 
 export function Navbar() {
     const location = useLocation();
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            // Threshold can be adjusted (e.g., 600 for hero height)
+            setIsScrolled(window.scrollY > 600);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const isActive = (path: string) => {
         if (path === '/') {
@@ -20,7 +32,7 @@ export function Navbar() {
     };
 
     return (
-        <nav className="navbar">
+        <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
             <div className="navbar-container">
                 {/* Logo */}
                 <Link to="/" className="navbar-logo">
