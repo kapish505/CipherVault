@@ -24,6 +24,21 @@ import type { WalletState } from '@/types';
 
 const STORAGE_KEY = 'ciphervault-wallet';
 
+// Singleton state management
+let globalState: WalletState = {
+    address: null,
+    isConnected: false,
+    chainId: null,
+};
+
+const listeners = new Set<(state: WalletState) => void>();
+
+function updateGlobalState(newState: WalletState) {
+    globalState = newState;
+    saveState(newState);
+    listeners.forEach(listener => listener(globalState));
+}
+
 /**
  * Get initial wallet state from localStorage
  */
@@ -44,6 +59,9 @@ function getInitialState(): WalletState {
     };
 }
 
+// Initialize global state
+globalState = getInitialState();
+
 /**
  * Save wallet state to localStorage
  */
@@ -56,9 +74,20 @@ function saveState(state: WalletState): void {
 }
 
 export function useWallet() {
-    const [state, setState] = useState<WalletState>(getInitialState);
+    const [state, setLocalState] = useState<WalletState>(globalState);
     const [isConnecting, setIsConnecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Subscribe to global state changes
+    useEffect(() => {
+        const listener = (newState: WalletState) => {
+            setLocalState(newState);
+        };
+        listeners.add(listener);
+        return () => {
+            listeners.delete(listener);
+        };
+    }, []);
 
     /**
      * Connect to wallet
@@ -76,8 +105,7 @@ export function useWallet() {
                 isConnected: true,
             };
 
-            setState(newState);
-            saveState(newState);
+            updateGlobalState(newState);
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to connect wallet';
             setError(errorMessage);
@@ -97,8 +125,7 @@ export function useWallet() {
             isConnected: false,
         };
 
-        setState(newState);
-        saveState(newState);
+        updateGlobalState(newState);
         walletService.disconnectWallet();
     }, []);
 
@@ -107,21 +134,26 @@ export function useWallet() {
      */
     useEffect(() => {
         const autoConnect = async () => {
-            // Only auto-connect if we have a stored connection
+            // Only auto-connect if we have a stored connection and are not already connected in memory
+            // The globalState check prevents redundant checks if another component already triggered it
             if (!state.isConnected) {
                 return;
             }
 
             try {
+                // If we are already connected via service (e.g. window.ethereum present), we don't need to do much
+                // But we should verify current address matches
                 const address = await walletService.getCurrentAddress();
                 const chainId = await walletService.getChainId();
 
                 if (address && chainId) {
-                    setState({
-                        address,
-                        chainId,
-                        isConnected: true,
-                    });
+                    if (address !== state.address) {
+                        updateGlobalState({
+                            address,
+                            chainId,
+                            isConnected: true,
+                        });
+                    }
                 } else {
                     // Wallet is no longer connected, clear state
                     disconnect();
@@ -132,8 +164,13 @@ export function useWallet() {
             }
         };
 
-        autoConnect();
-    }, []); // Only run on mount
+        // We only want to run this once effectively, but since this is a hook, 
+        // multiple components mounting shouldn't hurt as operations are idempotent-ish.
+        // However, checking globalState.isConnected before running helps.
+        if (state.isConnected) {
+            autoConnect();
+        }
+    }, []);
 
     /**
      * Listen for account changes
@@ -145,11 +182,7 @@ export function useWallet() {
                 disconnect();
             } else if (accounts[0] !== state.address) {
                 // User switched accounts
-                setState(prev => ({
-                    ...prev,
-                    address: accounts[0],
-                }));
-                saveState({
+                updateGlobalState({
                     ...state,
                     address: accounts[0],
                 });
@@ -166,11 +199,7 @@ export function useWallet() {
         const cleanup = walletService.onChainChanged((chainIdHex) => {
             const chainId = parseInt(chainIdHex, 16);
 
-            setState(prev => ({
-                ...prev,
-                chainId,
-            }));
-            saveState({
+            updateGlobalState({
                 ...state,
                 chainId,
             });

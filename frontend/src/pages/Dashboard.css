@@ -385,6 +385,11 @@
     align-items: center;
     justify-content: center;
     height: 100%;
+    /* Ensure full height */
+    width: 100%;
+    /* Ensure full width */
+    flex: 1;
+    /* Stretch to fill flex container */
     text-align: center;
     padding: var(--space-8);
 }

@@ -25,7 +25,7 @@ type SidebarSection = 'my-files' | 'shared' | 'recent' | 'starred' | 'trash';
 type ViewMode = 'list' | 'grid';
 
 export function Dashboard() {
-    const { address, isConnected } = useWallet();
+    const { address, isConnected, connect } = useWallet();
     const {
         currentFolderId,
         setCurrentFolderId,
@@ -95,6 +95,24 @@ export function Dashboard() {
                     <h1>Secure File Storage</h1>
                     <p>Connect your wallet to access your encrypted files.</p>
                     <p className="empty-hint">Zero-knowledge • Client-side encryption • Decentralized storage</p>
+                    <button
+                        className="btn-primary"
+                        onClick={connect}
+                        style={{
+                            marginTop: '24px',
+                            minWidth: '200px',
+                            background: 'linear-gradient(135deg, var(--color-accent) 0%, #3b82f6 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '12px 24px',
+                            borderRadius: '12px',
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)'
+                        }}
+                    >
+                        Connect Wallet
+                    </button>
                 </div>
             </div>
         );
