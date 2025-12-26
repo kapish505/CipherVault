@@ -31,6 +31,13 @@
  * - Works with encryption and IPFS services
  */
 
+// Public IPFS Gateways to check propagation
+const GATEWAYS = [
+    'https://gateway.pinata.cloud/ipfs/',
+    'https://ipfs.io/ipfs/',
+    'https://cloudflare-ipfs.com/ipfs/'
+];
+
 const DB_NAME = 'ciphervault';
 const DB_VERSION = 1;
 const STORE_NAME = 'files';
@@ -155,21 +162,8 @@ export async function getFilesByWallet(walletAddress: string): Promise<FileMetad
             files.forEach(f => {
                 if (f.targetReplicas === undefined) {
                     f.targetReplicas = 3;
-                    // Randomize current for demo variety: 3 (60%), 2 (30%), 1 (10%)
-                    const rand = Math.random();
-                    if (rand > 0.4) f.currentReplicas = 3;
-                    else if (rand > 0.1) f.currentReplicas = 2;
-                    else f.currentReplicas = 1;
-
-                    f.healthStatus = f.currentReplicas === 3 ? 'Healthy' : 'Degraded';
-                    // We don't await save here to avoid mass writes on read, 
-                    // but in a real app this would be in DB. 
-                    // For now, let's just mutate the object returned. 
-                    // Ideally we should persist this initialization.
-                    // Let's persist it async to keep UI fast.
-                    if (f.mimeType !== 'application/folder') {
-                        saveFileMetadata(f).catch(console.error);
-                    }
+                    f.currentReplicas = f.cid ? 1 : 0; // Default to 1 if uploaded
+                    f.healthStatus = 'Degraded'; // Assume degraded until checked
                 }
             });
 
@@ -418,38 +412,71 @@ export async function importDatabase(json: string, walletAddress: string): Promi
 }
 
 /**
- * Heal a file (Simulation)
+ * Verify Replicas (Real Network Check)
+ */
+export async function verifyReplicas(cid: string): Promise<number> {
+    if (!cid) return 0;
+
+    let successCount = 0;
+
+    // Check all gateways in parallel
+    const checks = GATEWAYS.map(async (gateway) => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // 2s timeout
+
+            const response = await fetch(`${gateway}${cid}`, {
+                method: 'HEAD',
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                return true;
+            }
+        } catch (e) {
+            // Ignore errors (gateway down, timeout, CORS)
+        }
+        return false;
+    });
+
+    const results = await Promise.all(checks);
+    successCount = results.filter(r => r).length;
+
+    return successCount;
+}
+
+/**
+ * Heal a file (Real Check)
  */
 export async function healFile(id: string): Promise<void> {
     const file = await getFileById(id);
-    if (!file) return;
+    if (!file || !file.cid) return;
 
     // 1. Set status to Recovering
     file.healthStatus = 'Recovering';
     await saveFileMetadata(file);
 
-    // 2. Simulate delay (2 seconds)
-    return new Promise((resolve) => {
-        setTimeout(async () => {
-            // Re-fetch to ensure no concurrent updates
-            const freshFile = await getFileById(id);
-            if (freshFile) {
-                // Increment replicas
-                freshFile.currentReplicas = (freshFile.currentReplicas || 0) + 1;
-                freshFile.lastHealed = Date.now();
+    // 2. Perform Real Network Check
+    const activeReplicas = await verifyReplicas(file.cid);
 
-                // Update status
-                const target = freshFile.targetReplicas || 3;
-                if (freshFile.currentReplicas >= target) {
-                    freshFile.currentReplicas = target; // Cap it
-                    freshFile.healthStatus = 'Healthy';
-                } else {
-                    freshFile.healthStatus = 'Degraded';
-                }
+    // 3. Update State
+    // Re-fetch to ensure no concurrent updates
+    const freshFile = await getFileById(id);
+    if (freshFile) {
+        freshFile.currentReplicas = activeReplicas;
+        freshFile.lastHealed = Date.now();
 
-                await saveFileMetadata(freshFile);
-            }
-            resolve();
-        }, 2000);
-    });
+        const target = freshFile.targetReplicas || 3;
+
+        // If we found it on at least 2 gateways, we consider it "Healthy" for this MVP
+        // (Since finding it on 3/3 is rare instantly)
+        if (freshFile.currentReplicas >= 2) {
+            freshFile.healthStatus = 'Healthy';
+        } else {
+            freshFile.healthStatus = 'Degraded';
+        }
+
+        await saveFileMetadata(freshFile);
+    }
 }
