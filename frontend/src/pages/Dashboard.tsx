@@ -16,6 +16,7 @@ import { FileList } from '@/components/dashboard/FileList';
 import { UploadManager } from '@/components/dashboard/UploadManager';
 import { AIAssistantPlaceholder } from '@/components/dashboard/AIAssistantPlaceholder';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
+import { Dialog } from '@/components/shared/Dialog';
 // import { syncFiles } from '@/services/sync'; // Disabled
 import * as metadata from '@/services/metadata';
 import { formatFileSize, formatDate } from '@/utils/format';
@@ -43,6 +44,19 @@ export function Dashboard() {
     const [selectedFile, setSelectedFile] = useState<metadata.FileMetadata | null>(null);
     const [showContextPanel, setShowContextPanel] = useState(false);
 
+    // Dialog State
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [dialogConfig, setDialogConfig] = useState<{
+        title: string;
+        description?: string;
+        variant: 'prompt' | 'alert' | 'confirm';
+        onConfirm: (value?: string) => void;
+    }>({
+        title: '',
+        variant: 'alert',
+        onConfirm: () => { }
+    });
+
     useEffect(() => {
         if (isConnected && address) {
             // handleSync(); // Backend sync disabled
@@ -69,19 +83,51 @@ export function Dashboard() {
         setShowContextPanel(false);
     };
 
-    const handleCreateFolder = async () => {
-        const name = prompt("Enter folder name:");
-        if (name) {
-            await createFolder(name, currentFolderId);
-            setRefreshTrigger(prev => prev + 1);
-        }
+    const handleCreateFolder = () => {
+        setDialogConfig({
+            title: 'Create New Folder',
+            description: 'Enter a name for your new encrypted folder.',
+            variant: 'prompt',
+            onConfirm: async (name) => {
+                if (name) {
+                    await createFolder(name, currentFolderId);
+                    setRefreshTrigger(prev => prev + 1);
+                    setDialogOpen(false);
+                }
+            }
+        });
+        setDialogOpen(true);
     };
 
-    const handleShare = async () => {
+    const handleShare = () => {
         if (selectedFile) {
-            await metadata.shareFile(selectedFile.id);
-            alert(`Link generated! ${selectedFile.name} is now in your Shared folder.`);
-            setRefreshTrigger(prev => prev + 1);
+            setDialogConfig({
+                title: 'File Shared Successfully',
+                description: `Link generated! ${selectedFile.name} is now available in your Shared folder.`,
+                variant: 'alert',
+                onConfirm: () => {
+                    metadata.shareFile(selectedFile.id).then(() => {
+                        setRefreshTrigger(prev => prev + 1);
+                        setDialogOpen(false);
+                    });
+                }
+            });
+            // Optimization: Call the share function immediately or changing logic to "Confirm Share" if desired.
+            // Based on previous code: alert came AFTER sharing? 
+            // Previous code: await share; alert();
+            // Let's adapt:
+
+            metadata.shareFile(selectedFile.id).then(() => {
+                // Show success dialog
+                setDialogConfig({
+                    title: 'File Shared',
+                    description: `${selectedFile.name} has been shared successfully.`,
+                    variant: 'alert',
+                    onConfirm: () => setDialogOpen(false)
+                });
+                setDialogOpen(true);
+                setRefreshTrigger(prev => prev + 1);
+            });
         }
     };
 
@@ -292,6 +338,16 @@ export function Dashboard() {
                     />
                 </div>
             </main>
+
+            {/* Global Dialog */}
+            <Dialog
+                isOpen={dialogOpen}
+                title={dialogConfig.title}
+                description={dialogConfig.description}
+                variant={dialogConfig.variant}
+                onConfirm={dialogConfig.onConfirm}
+                onCancel={() => setDialogOpen(false)}
+            />
 
             {/* Context Panel */}
             {showContextPanel && selectedFile && (
