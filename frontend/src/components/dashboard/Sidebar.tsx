@@ -145,10 +145,10 @@ export function Sidebar({
                 </div>
             </div>
 
-            <div className="sidebar-footer">
+            <div className="sidebar-footer p-0 border-t-0">
                 <StoragePanel {...storageProps} />
-                <div className="mt-2 text-[10px] text-center text-gray-600 font-mono select-none">
-                    PROTOTYPE SIMULATION
+                <div className="pb-4 text-[9px] text-center text-gray-700 font-mono select-none tracking-widest uppercase opacity-50">
+                    Prototype Simulation
                 </div>
             </div>
 
