@@ -16,144 +16,134 @@
 
 import './About.css';
 
-const UPCOMING_FEATURES = [
+/**
+ * About Page - The Sovereign Web
+ */
+
+import { useEffect } from 'react';
+import './About.css';
+
+const CORE_PILLARS = [
     {
-        title: 'Self-Healing Storage',
-        description: 'Automatic monitoring and repair of file replicas. If a node goes offline, the network automatically creates new replicas to maintain availability.',
+        title: 'The x402 Protocol',
+        icon: '⚡',
+        description: 'Inspired by HTTP 402 "Payment Required", this protocol layer introduces native economic metering to the web. It coordinates storage requests, incentivizes node operators, and manages resource allocation trustlessly.',
+        wide: true
     },
     {
-        title: 'Multi-Replication',
-        description: 'Every file is stored across multiple nodes (≥3 replicas) to ensure high availability and fault tolerance.',
+        title: 'Immutable Storage',
+        icon: '🧊',
+        description: 'Built on IPFS (InterPlanetary File System), files are content-addressed. This means data is retrieved by "what it is", not "where it is", creating a permanent, censorship-resistant web.',
+        wide: false
     },
     {
-        title: 'Community Storage Nodes',
-        description: 'Anyone can run a storage node and contribute to the network. Earn rewards for providing reliable storage.',
+        title: 'Zero-Knowledge',
+        icon: '🛡️',
+        description: 'Client-side AES-256-GCM encryption ensures that you alone hold the keys. The protocol proofs verify storage content without ever revealing the underlying data.',
+        wide: false
     },
     {
-        title: 'Chrome Extension Uploads',
-        description: 'Quick file uploads directly from your browser with drag-and-drop support. Seamlessly syncs with your dashboard.',
+        title: 'Self-Healing Mesh',
+        icon: '🕸️',
+        description: 'The network is alive. It actively monitors replica health, automatically repairing data entropy by re-pinning files to new nodes when older ones go offline. A true biological approach to data persistence.',
+        wide: true
+    }
+];
+
+const UPCOMING_ROADMAP = [
+    {
+        tag: 'Q2 2026',
+        title: 'Autonomous Data Guardians',
+        description: 'Local, private AI agents that organize, tag, and summarize your encrypted vault without the data ever leaving your device.'
     },
     {
-        title: 'Wallet-Only Identity',
-        description: 'No accounts, no passwords, no email. Your wallet is your identity. Connect and start storing immediately.',
+        tag: 'Experimental',
+        title: 'Data Sovereignty Markets',
+        description: 'Selectively decrypt and monetize your datasets. Offer your storage credits or unique data to the x402 network in exchange for tokens.'
     },
     {
-        title: 'Metadata-Only AI Assistant',
-        description: 'AI-powered search and organization using only encrypted metadata. Never accesses your file contents.',
+        tag: 'Protocol',
+        title: 'Governance DAO',
+        description: 'Protocol upgrades, fee structures, and storage parameters controlled directly by x402 utility token holders.'
     },
     {
-        title: 'Automatic Replica Repair',
-        description: 'Continuous background monitoring detects and repairs failed replicas without user intervention.',
+        tag: 'Client',
+        title: 'OS-Level Integration',
+        description: 'Native file system drivers for macOS and Windows. Mount your CipherVault directly as a local drive.'
     },
     {
-        title: 'Node Health Monitoring',
-        description: 'Real-time tracking of node status, capacity, and reliability scores to ensure optimal file placement.',
-    },
-    {
-        title: 'Decentralized Availability',
-        description: 'No single point of failure. Files remain accessible even if multiple nodes go offline.',
-    },
-    {
-        title: 'User-Owned Infrastructure',
-        description: 'You control your data and can run your own nodes. No dependency on corporate infrastructure.',
-    },
-    {
-        title: 'No Vendor Lock-In',
-        description: 'Open protocols and standards. Export your data anytime. Switch providers without losing access.',
-    },
+        tag: 'Network',
+        title: 'Offline-First Mesh',
+        description: 'Sync encrypted shards via Bluetooth LE and WiFi Direct when internet access is unavailable.'
+    }
 ];
 
 export function About() {
+    // Scroll to section handling
+    useEffect(() => {
+        if (window.location.hash) {
+            const element = document.querySelector(window.location.hash);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, []);
+
     return (
         <div className="about-page">
-            {/* What CipherVault Is */}
-            <section className="about-section section">
-                <div className="container">
-                    <h1>What is CipherVault?</h1>
-                    <p className="about-lead">
-                        CipherVault is a decentralized, user-owned cloud storage system that combines the
-                        familiarity of Google Drive with the security of client-side encryption and the
-                        resilience of distributed storage.
-                    </p>
-                    <p>
-                        Unlike traditional cloud storage providers, CipherVault never has access to your
-                        unencrypted files. Everything is encrypted in your browser before upload, distributed
-                        across IPFS and community nodes, and protected by self-healing replication.
-                    </p>
-                </div>
-            </section>
+            {/* Nav is global, but we ensure layout spacing in CSS */}
 
-            {/* Why Decentralized Storage Matters */}
-            <section className="about-section section">
-                <div className="container">
-                    <h2>Why Decentralized Storage Matters</h2>
-                    <p>
-                        Centralized cloud storage creates single points of failure, vendor lock-in, and
-                        privacy concerns. When one company controls your data:
+            {/* Hero Section */}
+            <section className="about-section">
+                <div className="about-container">
+                    <h1 className="section-title">The Sovereign Web.</h1>
+                    <p className="section-subtitle">
+                        We are building the storage layer for a new internet. <br />
+                        Where data is owned by users, not corporations. Where privacy is mathematical, not promised.
                     </p>
-                    <ul className="about-list">
-                        <li>They can read your files (even if they promise not to)</li>
-                        <li>They can lose your data in outages or breaches</li>
-                        <li>They can change pricing or terms at any time</li>
-                        <li>They can be compelled to hand over your data</li>
-                    </ul>
-                    <p>
-                        Decentralized storage solves these problems by distributing data across many
-                        independent nodes, encrypting everything client-side, and giving you full control.
-                    </p>
-                </div>
-            </section>
 
-            {/* Core Architecture Overview */}
-            <section className="about-section section">
-                <div className="container">
-                    <h2>Core Architecture</h2>
-                    <div className="architecture-grid">
-                        <div className="architecture-item">
-                            <h3>Client-Side Encryption</h3>
-                            <p>
-                                All files are encrypted in your browser using the Web Crypto API (AES-256-GCM)
-                                before upload. Your wallet controls the encryption keys.
-                            </p>
-                        </div>
-                        <div className="architecture-item">
-                            <h3>IPFS Storage</h3>
-                            <p>
-                                Encrypted files are stored on IPFS, a content-addressed distributed file system.
-                                Files are identified by their cryptographic hash (CID).
-                            </p>
-                        </div>
-                        <div className="architecture-item">
-                            <h3>Participation-Based Nodes</h3>
-                            <p>
-                                Community nodes earn trust and credits by proving storage reliability. This
-                                x402-based participation model ensures a robust and distributed network.
-                            </p>
-                        </div>
-                        <div className="architecture-item">
-                            <h3>Self-Healing Network</h3>
-                            <p>
-                                The network continuously monitors replica health and automatically repairs failures
-                                to maintain ≥3 replicas per file.
-                            </p>
-                        </div>
+                    {/* Architecture Bento Grid */}
+                    <div className="bento-grid">
+                        {CORE_PILLARS.map((item, idx) => (
+                            <div key={idx} className="bento-item">
+                                <div className="glow-bg" />
+                                <div className="bento-icon">{item.icon}</div>
+                                <div className="bento-title">{item.title}</div>
+                                <div className="bento-desc">{item.description}</div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* Upcoming Features - ANCHOR TARGET */}
-            <section id="upcoming-features" className="about-section section upcoming-features-section">
-                <div className="container">
-                    <h2>Upcoming Features</h2>
-                    <p className="about-lead">
-                        CipherVault is under active development. Here&apos;s what&apos;s coming next:
+            {/* Manifesto / Why */}
+            <section className="about-section">
+                <div className="about-container text-center">
+                    <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                        <h2 className="section-title" style={{ fontSize: '2rem' }}>Why We Build</h2>
+                        <p className="bento-desc" style={{ fontSize: '1.1rem' }}>
+                            The legacy internet was built on fragile assumptions: centralized servers, trusted third parties, and data rent-seeking.
+                            CipherVault demonstrates a new possibility. By combining the <strong>x402 protocol</strong> for economic coordination
+                            with cryptographic proofs, we create a system that can run forever, without any single owner.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            {/* Upcoming Roadmap */}
+            <section id="upcoming-features" className="about-section roadmap-section">
+                <div className="about-container">
+                    <h2 className="section-title">The Horizon</h2>
+                    <p className="section-subtitle">
+                        Our roadmap for the next generation of decentralized infrastructure.
                     </p>
 
-                    <div className="features-grid">
-                        {UPCOMING_FEATURES.map((feature, index) => (
-                            <div key={index} className="feature-card">
-                                <h3>{feature.title}</h3>
-                                <p>{feature.description}</p>
+                    <div className="roadmap-grid">
+                        {UPCOMING_ROADMAP.map((item, idx) => (
+                            <div key={idx} className="roadmap-card">
+                                <span className="roadmap-tag">{item.tag}</span>
+                                <h3 className="bento-title" style={{ fontSize: '1.2rem' }}>{item.title}</h3>
+                                <p className="bento-desc">{item.description}</p>
                             </div>
                         ))}
                     </div>
