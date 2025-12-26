@@ -31,6 +31,11 @@ export function Navbar() {
         return location.pathname.startsWith(path);
     };
 
+    // Hide Navbar on dashboard as it has its own sidebar layout
+    if (location.pathname.startsWith('/app')) {
+        return null;
+    }
+
     return (
         <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
             <div className="navbar-container">
