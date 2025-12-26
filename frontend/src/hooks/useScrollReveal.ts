@@ -16,7 +16,7 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
     const {
         threshold = 0.1,
         rootMargin = '0px',
-        triggerOnce = true,
+        triggerOnce = false, // Changed default to false per user request
     } = options;
 
     const ref = useRef<HTMLDivElement>(null);
@@ -33,8 +33,11 @@ export function useScrollReveal(options: ScrollRevealOptions = {}) {
                     if (triggerOnce) {
                         observer.unobserve(element);
                     }
-                } else if (!triggerOnce) {
-                    setIsVisible(false);
+                } else {
+                    // Always reset visibility if not triggerOnce
+                    if (!triggerOnce) {
+                        setIsVisible(false);
+                    }
                 }
             },
             { threshold, rootMargin }

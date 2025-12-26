@@ -188,7 +188,10 @@
 /* Upload Actions */
 .upload-actions {
     display: flex;
-    gap: var(--space-3);
+    flex-wrap: wrap;
+    /* Ensure wrapping on smaller screens */
+    gap: var(--space-6);
+    /* Increase gap for spaciousness */
     justify-content: center;
     margin-bottom: var(--space-6);
 }

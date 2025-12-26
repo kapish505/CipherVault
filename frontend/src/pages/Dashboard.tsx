@@ -205,15 +205,22 @@ export function Dashboard() {
                         </button>
                     </div>
 
-                    <div className="search-bar">
-                        <span className="search-icon">🔍</span>
-                        <input
-                            type="text"
-                            placeholder="Search files..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="search-input"
-                        />
+                    {/* Neuromorphic Search Bar */}
+                    <div className="search-wrapper-neu">
+                        <div className="search-container-neu">
+                            <input
+                                className="search-input-neu"
+                                placeholder="Search files..."
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <div className="search-icon-neu">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM11 18a7 7 0 1 1 7-7 7 7 0 0 1-7 7z" />
+                                </svg>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="action-bar-right">

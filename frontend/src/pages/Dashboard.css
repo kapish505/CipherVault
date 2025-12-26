@@ -155,80 +155,150 @@
     gap: var(--space-3);
 }
 
-.btn-upload {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
-    background: linear-gradient(135deg, var(--color-accent) 0%, #3b82f6 100%);
-    color: white;
-    border: none;
-    border-radius: var(--radius-full);
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-upload:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
-}
-
+.btn-upload,
 .btn-secondary {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-3) var(--space-5);
-    background-color: transparent;
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    border-radius: var(--radius-full);
+    cursor: pointer;
+    border-radius: 0.75rem;
+    /* rounded-xl */
+    border: 1.58px solid #52525b;
+    /* border-zinc-600 */
+    background-color: #09090b;
+    /* bg-zinc-950 */
+    padding: 0.75rem 1.25rem;
+    /* px-5 py-3 */
     font-size: 14px;
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    /* font-medium */
+    color: #e2e8f0;
+    /* text-slate-200 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    /* shadow-md */
+    transition: all 300ms ease;
+    /* duration-300 */
+    text-transform: none;
+    /* Reset distinct style */
 }
 
+.btn-upload:hover,
 .btn-secondary:hover {
-    background-color: var(--color-bg-secondary);
-    border-color: var(--color-text-tertiary);
+    transform: translateY(-0.335rem);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    /* shadow-xl */
+    /* Ensure colors don't change unexpectedly on hover unless specified */
+    background-color: #09090b;
+    border-color: #52525b;
+    color: #e2e8f0;
 }
 
-.search-bar {
+/* Optional: Slight differentiation for Upload if desired, or keep uniform. 
+   User asked to "change these buttons with [this]", so I will keep them uniform 
+   as per the request to use *that specific component*. 
+   However, making Upload slightly distinct (e.g. blue text or icon) might be good UX.
+   For now, I'll stick to the requested CSS rigidly.
+*/
+
+/* Neuromorphic Search Bar - Adapted for Dark Mode */
+.search-wrapper-neu {
+    position: relative;
+    background: linear-gradient(135deg, #27272a 0%, #18181b 100%);
+    /* Zinc 800 -> 900 */
+    border-radius: 1000px;
+    padding: 2px;
+    /* reduced padding */
+    display: grid;
+    place-content: center;
+    z-index: 0;
     flex: 1;
     max-width: 600px;
+    margin: 0;
+}
+
+.search-container-neu {
+    position: relative;
+    width: 100%;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #18181b 0%, #09090b 100%);
+    /* Zinc 900 -> 950 */
+    padding: 5px;
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    padding: 0 var(--space-4);
-    height: 44px;
-    background-color: var(--color-bg-secondary);
-    border: 1px solid transparent;
-    border-radius: var(--radius-xl);
-    transition: all 0.2s ease;
 }
 
-.search-bar:focus-within {
-    background-color: var(--color-bg-primary);
-    border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.search-icon {
-    font-size: 16px;
-    color: var(--color-text-tertiary);
-}
-
-.search-input {
-    flex: 1;
-    background: none;
-    border: none;
-    color: var(--color-text-primary);
-    font-size: 14px;
-    outline: none;
+.search-container-neu::after,
+.search-container-neu::before {
+    content: "";
+    width: 100%;
     height: 100%;
+    border-radius: inherit;
+    position: absolute;
+}
+
+.search-container-neu::before {
+    top: -1px;
+    left: -1px;
+    background: linear-gradient(0deg, #27272a 0%, #3f3f46 100%);
+    /* Zinc border gradient */
+    z-index: -1;
+}
+
+.search-container-neu::after {
+    bottom: -1px;
+    right: -1px;
+    background: linear-gradient(0deg, #18181b 0%, #27272a 100%);
+    box-shadow: rgba(0, 0, 0, 0.5) 3px 3px 5px 0px, rgba(0, 0, 0, 0.3) 5px 5px 20px 0px;
+    z-index: -2;
+}
+
+.search-input-neu {
+    padding: 10px 15px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #e4e4e7;
+    /* Zinc 200 */
+    font-size: 15px;
+    border-radius: 50px;
+}
+
+.search-input-neu:focus {
+    outline: none;
+    /* Optional: slight inner glow or change */
+}
+
+.search-icon-neu {
+    width: 40px;
+    height: 40px;
+    /* Force height for SVG */
+    min-width: 40px;
+    aspect-ratio: 1;
+    border-left: 2px solid #52525b;
+    /* Zinc 600 */
+    border-top: 3px solid transparent;
+    border-bottom: 3px solid transparent;
+    border-radius: 50%;
+    padding: 8px;
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-icon-neu:hover {
+    border-left: 3px solid #e4e4e7;
+}
+
+.search-icon-neu path {
+    fill: #a1a1aa;
+    /* Zinc 400 */
+    transition: fill 0.2s;
+}
+
+.search-icon-neu:hover path {
+    fill: white;
 }
 
 .action-bar-right {

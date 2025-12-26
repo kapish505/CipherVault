@@ -25,7 +25,7 @@ export function UploadButton3D({ label, onClick, icon = '📄', variant = 'blue'
                 <div className="back-side"></div>
             </div>
             <button className="upload-3d-btn" type="button">
-                {icon && <span style={{ marginRight: '8px' }}>{icon}</span>}
+                {icon && <span>{icon}</span>}
                 {label}
             </button>
         </div>
