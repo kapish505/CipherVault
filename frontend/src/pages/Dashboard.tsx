@@ -399,8 +399,8 @@ export function Dashboard() {
                                         <span className="animate-spin">↻</span> Syncing...
                                     </span>
                                 ) : syncStatus.error ? (
-                                    <span className="text-red-400" title={syncStatus.error}>
-                                        ⚠ Sync Error
+                                    <span className="text-amber-500/80 flex items-center gap-1 cursor-help" title={`Cloud sync failed: ${syncStatus.error}. Using local storage.`}>
+                                        <span>⚠️</span> Local Only
                                     </span>
                                 ) : syncStatus.lastSynced ? (
                                     <span className="text-green-500 flex items-center gap-1">
