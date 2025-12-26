@@ -17,6 +17,7 @@ import { formatFileSize, formatDate } from '@/utils/format';
 import { getFileTypeIcon } from './FilePreview';
 import { ClassificationBadge } from './ClassificationBadge';
 import { ReplicaStatus } from './ReplicaStatus';
+import { EmptyState } from '@/components/shared/EmptyState';
 import './FileList.css';
 
 interface FileListProps {
@@ -24,7 +25,10 @@ interface FileListProps {
     viewMode?: 'list' | 'grid';
     searchQuery?: string;
     onFileSelect?: (file: metadata.FileMetadata) => void;
+    onFolderSelect?: (folderId: string) => void;
     selectedFileId?: string;
+    activeSection?: 'my-files' | 'shared' | 'recent' | 'starred' | 'trash';
+    folderId?: string | null;
 }
 
 export function FileList({
@@ -32,12 +36,55 @@ export function FileList({
     viewMode = 'list',
     searchQuery = '',
     onFileSelect,
-    selectedFileId
+    onFolderSelect,
+    selectedFileId,
+    activeSection = 'my-files',
+    folderId = null
 }: FileListProps) {
     const { address, isConnected } = useWallet();
     const [files, setFiles] = useState<metadata.FileMetadata[]>([]);
     const [loading, setLoading] = useState(true);
     const [downloadingId, setDownloadingId] = useState<string | null>(null);
+    const [draggedFileId, setDraggedFileId] = useState<string | null>(null);
+
+    const handleDragStart = (e: React.DragEvent, file: metadata.FileMetadata) => {
+        setDraggedFileId(file.id);
+        e.dataTransfer.effectAllowed = 'move';
+        // Set invisible drag image or custom one if needed, default is fine
+    };
+
+    const handleDragOver = (e: React.DragEvent, targetFile: metadata.FileMetadata) => {
+        if (!draggedFileId || draggedFileId === targetFile.id) return;
+
+        // Only allow dropping on folders
+        if (targetFile.mimeType === 'application/folder') {
+            e.preventDefault(); // allow drop
+            e.dataTransfer.dropEffect = 'move';
+            e.currentTarget.classList.add('drag-over');
+        }
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.currentTarget.classList.remove('drag-over');
+    };
+
+    const handleDrop = async (e: React.DragEvent, targetFolder: metadata.FileMetadata) => {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+
+        if (!draggedFileId || targetFolder.mimeType !== 'application/folder') return;
+
+        try {
+            await metadata.moveFileToFolder(draggedFileId, targetFolder.id);
+            // Refresh list or optimistic update
+            setFiles(prev => prev.filter(f => f.id !== draggedFileId));
+        } catch (error) {
+            console.error('Failed to move file:', error);
+            alert('Failed to move file');
+        }
+
+        setDraggedFileId(null);
+    };
 
     useEffect(() => {
         const loadFiles = async () => {
@@ -61,18 +108,56 @@ export function FileList({
     }, [address, isConnected, refreshTrigger]);
 
     const filteredFiles = useMemo(() => {
-        if (!searchQuery) return files;
+        let result = files;
 
-        const query = searchQuery.toLowerCase();
-        return files.filter(file =>
-            file.name.toLowerCase().includes(query)
-        );
-    }, [files, searchQuery]);
+        // 1. Filter by Section
+        switch (activeSection) {
+            case 'trash':
+                result = result.filter(f => f.isTrashed);
+                break;
+            case 'starred':
+                result = result.filter(f => !f.isTrashed && f.isStarred);
+                break;
+            case 'recent':
+                result = result.filter(f => !f.isTrashed);
+                // Sort by accessedAt if available, else uploadedAt
+                result.sort((a, b) => (b.accessedAt || b.uploadedAt) - (a.accessedAt || a.uploadedAt));
+                break;
+            case 'shared':
+                // For now, shared is just a placeholder unless we implement link sharing tracking
+                result = result.filter(f => !f.isTrashed && (f.sharedWith && f.sharedWith.length > 0));
+                break;
+            case 'my-files':
+            default:
+                // Filter by Folder ID (null for root)
+                result = result.filter(f => !f.isTrashed && (f.folderId === folderId || (!f.folderId && !folderId)));
+                // Standard sort by upload date
+                result.sort((a, b) => {
+                    // Folders first
+                    if (a.mimeType === 'application/folder' && b.mimeType !== 'application/folder') return -1;
+                    if (a.mimeType !== 'application/folder' && b.mimeType === 'application/folder') return 1;
+                    return b.uploadedAt - a.uploadedAt;
+                });
+                break;
+        }
+
+        // 2. Filter by Search (global search)
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            // If searching, ignore folder structure and search everything (except trash)
+            // Restore full list for search if we were restricted by folder
+            let searchBase = activeSection === 'trash' ? files.filter(f => f.isTrashed) : files.filter(f => !f.isTrashed);
+
+            result = searchBase.filter(file =>
+                file.name.toLowerCase().includes(query)
+            );
+        }
+
+        return result;
+    }, [files, searchQuery, activeSection, folderId]);
 
     const handleDownload = async (file: metadata.FileMetadata) => {
         if (!address) return;
-        setDownloadingId(file.id);
-
         try {
             const encryptedData = await ipfs.downloadFile(file.cid);
             const walletKey = await encryption.deriveKeyFromWallet(address);
@@ -104,17 +189,59 @@ export function FileList({
     };
 
     const handleDelete = async (file: metadata.FileMetadata) => {
-        if (!confirm(`Delete "${file.name}"? This cannot be undone.`)) {
+        if (activeSection === 'trash') {
+            if (!confirm(`Permanently delete "${file.name}"? This cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                await metadata.deleteFileMetadata(file.id);
+                setFiles(files.filter(f => f.id !== file.id));
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Failed to delete file.');
+            }
+        } else {
+            // Soft delete (Move to Trash)
+            try {
+                await metadata.moveToTrash(file.id);
+                // Remove from current view
+                setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isTrashed: true } : f));
+            } catch (error) {
+                console.error('Trash error:', error);
+            }
+        }
+    };
+
+    const handleRestore = async (file: metadata.FileMetadata) => {
+        try {
+            await metadata.restoreFromTrash(file.id);
+            // Remove from trash view (or update status)
+            setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isTrashed: false } : f));
+        } catch (error) {
+            console.error('Restore error:', error);
+        }
+    };
+
+    const handleToggleStar = async (file: metadata.FileMetadata) => {
+        try {
+            await metadata.toggleStar(file.id);
+            setFiles(prev => prev.map(f => f.id === file.id ? { ...f, isStarred: !f.isStarred } : f));
+        } catch (error) {
+            console.error('Star error:', error);
+        }
+    };
+
+    const handleItemClick = async (file: metadata.FileMetadata) => {
+        if (file.mimeType === 'application/folder') {
+            onFolderSelect?.(file.id);
             return;
         }
 
-        try {
-            await metadata.deleteFileMetadata(file.id);
-            setFiles(files.filter(f => f.id !== file.id));
-        } catch (error) {
-            console.error('Delete error:', error);
-            alert('Failed to delete file.');
-        }
+        // Update interaction time
+        metadata.updateAccessTime(file.id).catch(console.error);
+
+        onFileSelect?.(file);
     };
 
     if (!isConnected) {
@@ -131,32 +258,76 @@ export function FileList({
     }
 
     if (filteredFiles.length === 0) {
-        return (
-            <div className="file-list-empty">
-                {searchQuery ? (
-                    <>
-                        <span className="empty-icon">🔍</span>
-                        <h3>No files found</h3>
-                        <p>No files match &quot;{searchQuery}&quot;</p>
-                    </>
-                ) : (
-                    <>
+        if (searchQuery) {
+            return (
+                <div className="file-list-empty">
+                    <span className="empty-icon">🔍</span>
+                    <h3>No files found</h3>
+                    <p>No files match &quot;{searchQuery}&quot;</p>
+                </div>
+            );
+        }
+
+        switch (activeSection) {
+            case 'trash':
+                return (
+                    <EmptyState
+                        icon="🗑️"
+                        title="Trash is Empty"
+                        description="Deleted files will appear here"
+                    />
+                );
+            case 'starred':
+                return (
+                    <EmptyState
+                        icon="⭐"
+                        title="No Starred Files"
+                        description="Star files to find them quickly"
+                    />
+                );
+            case 'recent':
+                return (
+                    <EmptyState
+                        icon="🕐"
+                        title="No Recent Files"
+                        description="Recently accessed files will appear here"
+                    />
+                );
+            case 'shared':
+                return (
+                    <EmptyState
+                        icon="👥"
+                        title="No Shared Files"
+                        description="Files shared with you will appear here"
+                    />
+                );
+            case 'my-files':
+            default:
+                return (
+                    <div className="file-list-empty">
                         <span className="empty-icon">📁</span>
                         <h3>No files yet</h3>
                         <p>Upload your first encrypted file to get started.</p>
                         <p className="empty-hint">Files are encrypted in your browser before upload. Only you can decrypt them.</p>
-                    </>
-                )}
-            </div>
-        );
+                    </div>
+                );
+        }
     }
 
     if (viewMode === 'grid') {
         return (
             <div className="file-grid">
                 {filteredFiles.map((file) => (
-                    <div key={file.id} className="file-grid-item">
-                        <div className="file-grid-preview">
+                    <div
+                        key={file.id}
+                        className={`file-grid-item ${file.mimeType === 'application/folder' ? 'is-folder' : ''}`}
+                        draggable={activeSection === 'my-files'}
+                        onDragStart={(e) => handleDragStart(e, file)}
+                        onDragOver={(e) => handleDragOver(e, file)}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, file)}
+                    >
+                        <div className="file-grid-preview" onClick={() => handleItemClick(file)}>
                             <span className="file-type-icon-large">{getFileTypeIcon(file.mimeType)}</span>
                         </div>
                         <div className="file-grid-name" title={file.name}>
@@ -167,6 +338,13 @@ export function FileList({
                         </div>
                         <div className="file-grid-actions">
                             <button
+                                className={`action-btn-small ${file.isStarred ? 'active' : ''}`}
+                                onClick={() => handleToggleStar(file)}
+                                title={file.isStarred ? "Unstar" : "Star"}
+                            >
+                                {file.isStarred ? '⭐' : '☆'}
+                            </button>
+                            <button
                                 className="action-btn-small"
                                 onClick={() => handleDownload(file)}
                                 disabled={downloadingId === file.id}
@@ -174,11 +352,21 @@ export function FileList({
                             >
                                 ⬇️
                             </button>
+                            {activeSection === 'trash' && (
+                                <button
+                                    className="action-btn-small"
+                                    onClick={() => handleRestore(file)}
+                                    disabled={downloadingId === file.id}
+                                    title="Restore"
+                                >
+                                    ♻️
+                                </button>
+                            )}
                             <button
                                 className="action-btn-small"
                                 onClick={() => handleDelete(file)}
                                 disabled={downloadingId === file.id}
-                                title="Delete"
+                                title={activeSection === 'trash' ? 'Delete Forever' : 'Move to Trash'}
                             >
                                 🗑️
                             </button>
@@ -212,10 +400,24 @@ export function FileList({
                 ${downloadingId === file.id ? 'downloading' : ''}
                 ${selectedFileId === file.id ? 'selected' : ''}
               `}
-                            onClick={() => onFileSelect?.(file)}
+                            draggable={activeSection === 'my-files'}
+                            onDragStart={(e) => handleDragStart(e, file)}
+                            onDragOver={(e) => handleDragOver(e, file)}
+                            onDragLeave={handleDragLeave}
+                            onDrop={(e) => handleDrop(e, file)}
+                            onClick={() => handleItemClick(file)}
                         >
                             <td className="col-name">
                                 <div className="file-name-cell">
+                                    <button
+                                        className={`star-btn ${file.isStarred ? 'starred' : ''}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleToggleStar(file);
+                                        }}
+                                    >
+                                        {file.isStarred ? '⭐' : '☆'}
+                                    </button>
                                     <span className="file-icon">{getFileTypeIcon(file.mimeType)}</span>
                                     <span className="file-name" title={file.name}>{file.name}</span>
                                 </div>
@@ -255,6 +457,18 @@ export function FileList({
                                     >
                                         {downloadingId === file.id ? '⟳' : '⬇️'}
                                     </button>
+                                    {activeSection === 'trash' && (
+                                        <button
+                                            className="action-btn-icon"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRestore(file);
+                                            }}
+                                            title="Restore file"
+                                        >
+                                            ♻️
+                                        </button>
+                                    )}
                                     <button
                                         className="action-btn-icon action-delete"
                                         onClick={(e) => {
@@ -262,7 +476,7 @@ export function FileList({
                                             handleDelete(file);
                                         }}
                                         disabled={downloadingId === file.id}
-                                        title="Delete file"
+                                        title={activeSection === 'trash' ? 'Delete Forever' : 'Move to Trash'}
                                     >
                                         🗑️
                                     </button>

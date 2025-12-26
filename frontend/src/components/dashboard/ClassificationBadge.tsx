@@ -38,7 +38,7 @@ export function ClassificationBadge({ classification, showLabel = true }: Classi
     return (
         <div
             className={`classification-badge classification-${classification}`}
-            style={{ borderColor: config.color }}
+            // style={{ borderColor: config.color }} // Removed border for cleaner look
             title={config.description}
         >
             <span className="classification-icon">{config.icon}</span>

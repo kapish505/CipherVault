@@ -51,6 +51,26 @@ export interface FileMetadata {
     walletAddress: string;
     folderId?: string | null;
     classification?: string;
+    // New fields for File Explorer features
+    isTrashed?: boolean;
+    isStarred?: boolean;
+    sharedWith?: string[]; // List of wallet addresses or emails (simulated)
+    accessedAt?: number;
+    path?: string[]; // Breadcrumb path IDs
+}
+
+/**
+ * Folder interface (stored in the same object store as files, but with distinct type)
+ */
+export interface FolderMetadata {
+    id: string;
+    name: string;
+    createdAt: number;
+    walletAddress: string;
+    parentId?: string | null;
+    path?: string[];
+    isTrashed?: boolean;
+    isStarred?: boolean;
 }
 
 /**
@@ -130,6 +150,17 @@ export async function getFilesByWallet(walletAddress: string): Promise<FileMetad
 }
 
 /**
+ * Move file to a folder
+ */
+export async function moveFileToFolder(fileId: string, folderId: string | null): Promise<void> {
+    const file = await getFileById(fileId);
+    if (!file) return;
+
+    file.folderId = folderId;
+    await saveFileMetadata(file);
+}
+
+/**
  * Get file metadata by ID
  */
 export async function getFileById(id: string): Promise<FileMetadata | null> {
@@ -150,9 +181,6 @@ export async function getFileById(id: string): Promise<FileMetadata | null> {
     });
 }
 
-/**
- * Delete file metadata
- */
 export async function deleteFileMetadata(id: string): Promise<void> {
     const db = await openDB();
 
@@ -169,6 +197,90 @@ export async function deleteFileMetadata(id: string): Promise<void> {
             reject(new Error('Failed to delete file'));
         };
     });
+}
+
+/**
+ * Move file to trash (Soft Delete)
+ */
+export async function moveToTrash(id: string): Promise<void> {
+    const file = await getFileById(id);
+    if (!file) return;
+
+    file.isTrashed = true;
+    await saveFileMetadata(file);
+}
+
+/**
+ * Restore file from trash
+ */
+export async function restoreFromTrash(id: string): Promise<void> {
+    const file = await getFileById(id);
+    if (!file) return;
+
+    file.isTrashed = false;
+    await saveFileMetadata(file);
+}
+
+/**
+ * Toggle Star status
+ */
+export async function toggleStar(id: string): Promise<void> {
+    const file = await getFileById(id);
+    if (!file) return;
+
+    file.isStarred = !file.isStarred;
+    await saveFileMetadata(file);
+}
+
+/**
+ * Update access time (for Recent view)
+ */
+export async function updateAccessTime(id: string): Promise<void> {
+    const file = await getFileById(id);
+    if (!file) return;
+
+    file.accessedAt = Date.now();
+    await saveFileMetadata(file);
+}
+
+/**
+ * Create a new folder
+ */
+export async function createFolder(name: string, walletAddress: string, parentId?: string | null): Promise<string> {
+    const id = crypto.randomUUID();
+    const folder: any = {
+        id,
+        name,
+        size: 0,
+        mimeType: 'application/folder', // Special type for folders
+        uploadedAt: Date.now(),
+        cid: '', // Folders don't have CIDs initially
+        encryptedKey: '',
+        keyIV: '',
+        fileIV: '',
+        walletAddress,
+        folderId: parentId,
+        isTrashed: false,
+        isStarred: false
+    };
+
+    await saveFileMetadata(folder);
+    return id;
+}
+
+
+/**
+ * Share a file (Simulate by setting sharedWith)
+ */
+export async function shareFile(id: string): Promise<void> {
+    const file = await getFileById(id);
+    if (!file) return;
+
+    if (!file.sharedWith) file.sharedWith = [];
+    if (!file.sharedWith.includes('public')) {
+        file.sharedWith.push('public');
+    }
+    await saveFileMetadata(file);
 }
 
 /**

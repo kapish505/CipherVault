@@ -10,13 +10,14 @@
 
 import { useState, useEffect } from 'react';
 import { useWallet } from '@/hooks/useWallet';
+import { useFolders } from '@/hooks/useFolders';
 import { FileUpload } from '@/components/dashboard/FileUpload';
 import { FileList } from '@/components/dashboard/FileList';
 import { UploadManager } from '@/components/dashboard/UploadManager';
 import { AIAssistantPlaceholder } from '@/components/dashboard/AIAssistantPlaceholder';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { syncFiles } from '@/services/sync';
+// import { syncFiles } from '@/services/sync'; // Disabled
 import * as metadata from '@/services/metadata';
 import { formatFileSize, formatDate } from '@/utils/format';
 import './Dashboard.css';
@@ -26,6 +27,14 @@ type ViewMode = 'list' | 'grid';
 
 export function Dashboard() {
     const { address, isConnected } = useWallet();
+    const {
+        currentFolderId,
+        setCurrentFolderId,
+        getFolderPath,
+        getPinnedFolders,
+        createFolder,
+        reload: reloadFolders
+    } = useFolders(address);
     const [activeSection, setActiveSection] = useState<SidebarSection>('my-files');
     const [viewMode, setViewMode] = useState<ViewMode>('list');
     const [searchQuery, setSearchQuery] = useState('');
@@ -37,33 +46,18 @@ export function Dashboard() {
 
     useEffect(() => {
         if (isConnected && address) {
-            // handleSync(); // Backend sync disabled for client-side only mode
+            // handleSync(); // Backend sync disabled
         }
     }, [isConnected, address]);
 
     const handleUploadComplete = () => {
-        // Just refresh the file list, don't close the modal
-        // This allows users to upload multiple batches
         setRefreshTrigger(prev => prev + 1);
+        reloadFolders();
     };
 
     const handleSync = async () => {
-        // Backend sync disabled for client-side only mode
-        /* 
-        if (!address) return;
-        setIsSyncing(true);
-
-        try {
-            await syncFiles(address);
-            setRefreshTrigger(prev => prev + 1);
-        } catch (error) {
-            console.error('Sync failed:', error);
-        } finally {
-            setIsSyncing(false);
-        }
-        */
-        // Just refresh local list
         setRefreshTrigger(prev => prev + 1);
+        reloadFolders();
     };
 
     const handleFileSelect = (file: metadata.FileMetadata) => {
@@ -75,6 +69,24 @@ export function Dashboard() {
         setSelectedFile(null);
         setShowContextPanel(false);
     };
+
+    const handleCreateFolder = async () => {
+        const name = prompt("Enter folder name:");
+        if (name) {
+            await createFolder(name, currentFolderId);
+            setRefreshTrigger(prev => prev + 1);
+        }
+    };
+
+    const handleShare = async () => {
+        if (selectedFile) {
+            await metadata.shareFile(selectedFile.id);
+            alert(`Link generated! ${selectedFile.name} is now in your Shared folder.`);
+            setRefreshTrigger(prev => prev + 1);
+        }
+    };
+
+    const pinnedFolders = getPinnedFolders();
 
     if (!isConnected) {
         return (
@@ -97,7 +109,7 @@ export function Dashboard() {
                     <div className="sidebar-group">
                         <button
                             className={`sidebar-item ${activeSection === 'my-files' ? 'active' : ''}`}
-                            onClick={() => setActiveSection('my-files')}
+                            onClick={() => { setActiveSection('my-files'); setCurrentFolderId(null); }}
                         >
                             <span className="sidebar-icon">📁</span>
                             <span className="sidebar-label">My Files</span>
@@ -112,6 +124,29 @@ export function Dashboard() {
                     </div>
 
                     <div className="sidebar-divider"></div>
+
+                    {/* Pinned Folders Section */}
+                    {pinnedFolders.length > 0 && (
+                        <>
+                            <div className="sidebar-group-label">Pinned Folders</div>
+                            <div className="sidebar-group">
+                                {pinnedFolders.map(folder => (
+                                    <button
+                                        key={folder.id}
+                                        className={`sidebar-item ${currentFolderId === folder.id ? 'active' : ''}`}
+                                        onClick={() => {
+                                            setActiveSection('my-files');
+                                            setCurrentFolderId(folder.id);
+                                        }}
+                                    >
+                                        <span className="sidebar-icon">📌</span>
+                                        <span className="sidebar-label">{folder.name}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="sidebar-divider"></div>
+                        </>
+                    )}
 
                     <div className="sidebar-group">
                         <button
@@ -160,10 +195,16 @@ export function Dashboard() {
             {/* Main Content */}
             <main className="dashboard-main">
                 <div className="action-bar">
-                    <button className="btn-upload" onClick={() => setShowUploadModal(true)}>
-                        <span className="upload-icon">↑</span>
-                        Upload
-                    </button>
+                    <div className="action-group">
+                        <button className="btn-upload" onClick={() => setShowUploadModal(true)}>
+                            <span className="upload-icon">↑</span>
+                            Upload
+                        </button>
+                        <button className="btn-secondary" onClick={handleCreateFolder}>
+                            <span className="icon">📁</span>
+                            New Folder
+                        </button>
+                    </div>
 
                     <div className="search-bar">
                         <span className="search-icon">🔍</span>
@@ -181,7 +222,7 @@ export function Dashboard() {
                             className="btn-sync"
                             onClick={() => handleSync()}
                             disabled={isSyncing}
-                            title="Sync with backend"
+                            title="Refresh"
                         >
                             {isSyncing ? '⟳' : '🔄'}
                         </button>
@@ -209,34 +250,22 @@ export function Dashboard() {
                     {/* AI Assistant Placeholder */}
                     <AIAssistantPlaceholder />
 
-                    {/* Breadcrumb Navigation */}
-                    <Breadcrumb walletAddress={address} />
+                    {/* Breadcrumb Navigation - Now Controlled */}
+                    <Breadcrumb
+                        path={getFolderPath(currentFolderId)}
+                        onNavigate={setCurrentFolderId}
+                    />
 
-                    {activeSection === 'my-files' && (
-                        <FileList
-                            refreshTrigger={refreshTrigger}
-                            viewMode={viewMode}
-                            searchQuery={searchQuery}
-                            onFileSelect={handleFileSelect}
-                            selectedFileId={selectedFile?.id}
-                        />
-                    )}
-
-                    {activeSection !== 'my-files' && (
-                        <EmptyState
-                            icon={activeSection === 'shared' ? '👥' :
-                                activeSection === 'recent' ? '🕐' :
-                                    activeSection === 'starred' ? '⭐' : '🗑️'}
-                            title={activeSection === 'shared' ? 'No Shared Files' :
-                                activeSection === 'recent' ? 'No Recent Files' :
-                                    activeSection === 'starred' ? 'No Starred Files' :
-                                        'Trash is Empty'}
-                            description={activeSection === 'shared' ? 'Files shared with you will appear here' :
-                                activeSection === 'recent' ? 'Recently accessed files will appear here' :
-                                    activeSection === 'starred' ? 'Star files to find them quickly' :
-                                        'Deleted files will appear here'}
-                        />
-                    )}
+                    <FileList
+                        refreshTrigger={refreshTrigger}
+                        viewMode={viewMode}
+                        searchQuery={searchQuery}
+                        onFileSelect={handleFileSelect}
+                        onFolderSelect={(id) => setCurrentFolderId(id)}
+                        selectedFileId={selectedFile?.id}
+                        activeSection={activeSection}
+                        folderId={currentFolderId}
+                    />
                 </div>
             </main>
 
@@ -252,6 +281,50 @@ export function Dashboard() {
                         <div className="context-preview">
                             <div className="preview-icon">📄</div>
                             <div className="preview-name">{selectedFile.name}</div>
+                        </div>
+
+                        <div className="context-actions">
+                            <button className="context-action-btn" onClick={handleShare}>
+                                <span className="btn-icon">🔗</span>
+                                Share File
+                            </button>
+                            <button
+                                className="context-action-btn"
+                                onClick={() => metadata.toggleStar(selectedFile.id).then(() => {
+                                    setRefreshTrigger(p => p + 1);
+                                    // Optimistic update
+                                    setSelectedFile({ ...selectedFile, isStarred: !selectedFile.isStarred });
+                                })}
+                            >
+                                <span className="btn-icon">⭐</span>
+                                {selectedFile.isStarred ? 'Unstar' : 'Star'}
+                            </button>
+                        </div>
+
+                        <div className="context-section">
+                            <div className="context-label">Properties</div>
+                            <div className="property-list">
+                                <div className="property-item">
+                                    <span className="property-key">Size</span>
+                                    <span className="property-value">{formatFileSize(selectedFile.size)}</span>
+                                </div>
+                                <div className="property-item">
+                                    <span className="property-key">Type</span>
+                                    <span className="property-value">{selectedFile.mimeType}</span>
+                                </div>
+                                <div className="property-item">
+                                    <span className="property-key">Uploaded</span>
+                                    <span className="property-value">{formatDate(selectedFile.uploadedAt)}</span>
+                                </div>
+                                <div className="property-item">
+                                    <span className="property-key">Location</span>
+                                    <span className="property-value">{selectedFile.folderId ? 'Folder' : 'My Files'}</span>
+                                </div>
+                                <div className="property-item">
+                                    <span className="property-key">CID</span>
+                                    <span className="property-value property-mono">{selectedFile.cid.slice(0, 12)}...</span>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="context-section">
@@ -271,58 +344,25 @@ export function Dashboard() {
                                 </div>
                             </div>
                         </div>
-
-                        <div className="context-section">
-                            <div className="context-label">Properties</div>
-                            <div className="property-list">
-                                <div className="property-item">
-                                    <span className="property-key">Size</span>
-                                    <span className="property-value">{formatFileSize(selectedFile.size)}</span>
-                                </div>
-                                <div className="property-item">
-                                    <span className="property-key">Type</span>
-                                    <span className="property-value">{selectedFile.mimeType}</span>
-                                </div>
-                                <div className="property-item">
-                                    <span className="property-key">Uploaded</span>
-                                    <span className="property-value">{formatDate(selectedFile.uploadedAt)}</span>
-                                </div>
-                                <div className="property-item">
-                                    <span className="property-key">CID</span>
-                                    <span className="property-value property-mono">{selectedFile.cid.slice(0, 12)}...</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="context-section">
-                            <div className="context-label">Storage</div>
-                            <div className="storage-nodes">
-                                <div className="node-item">
-                                    <span className="node-status">✓</span>
-                                    <span className="node-text">Primary replica</span>
-                                </div>
-                                <div className="node-hint">Stored on IPFS network</div>
-                            </div>
-                        </div>
                     </div>
                 </aside>
             )}
 
             {/* Upload Modal */}
             {showUploadModal && (
-                <div className="upload-modal-overlay" onClick={() => setShowUploadModal(false)}>
-                    <div className="upload-modal" onClick={(e) => e.stopPropagation()}>
-                        <div className="upload-modal-header">
-                            <h2>Upload File</h2>
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h2>Upload Files</h2>
                             <button className="modal-close" onClick={() => setShowUploadModal(false)}>✕</button>
                         </div>
-                        <FileUpload onUploadComplete={handleUploadComplete} />
+                        <UploadManager
+                            onUploadComplete={handleUploadComplete}
+                            currentFolderId={currentFolderId}
+                        />
                     </div>
                 </div>
             )}
-
-            {/* Upload Manager - Fixed Bottom Panel */}
-            <UploadManager />
         </div>
     );
 }

@@ -54,7 +54,7 @@ export function ReplicaStatus({ fileId }: ReplicaStatusProps) {
             <div className={`health-badge health-${health}`}>
                 {health === 'healthy' ? '✓ Healthy' : '⚠ Degraded'}
             </div>
-            <div className="prototype-label">Real</div>
+            {/* Real badge removed for cleaner UI */}
         </div>
     );
 }
