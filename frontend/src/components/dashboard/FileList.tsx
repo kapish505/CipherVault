@@ -16,11 +16,12 @@ import * as metadata from '@/services/metadata';
 import { formatFileSize, formatDate } from '@/utils/format';
 import { getFileTypeIcon } from './FilePreview';
 import { ClassificationBadge } from './ClassificationBadge';
-import { ReplicaStatus } from './ReplicaStatus';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { ReplicaBadge } from './ReplicaBadge';
 import './FileList.css';
 
 interface FileListProps {
+    // ... existing props
     refreshTrigger: number;
     viewMode?: 'list' | 'grid';
     searchQuery?: string;
@@ -53,6 +54,7 @@ export function FileList({
     onFileChange,
     onDelete
 }: FileListProps) {
+    // ... existing hooks
     const { address, isConnected } = useWallet();
     const [files, setFiles] = useState<metadata.FileMetadata[]>([]);
     const [loading, setLoading] = useState(true);
@@ -71,6 +73,12 @@ export function FileList({
             direction: current.key === key && current.direction === 'desc' ? 'asc' : 'desc'
         }));
     };
+
+    // ... existing drag handlers ... 
+
+    // ... we need to inject handleHeal before return ...
+
+
 
     const getSortIcon = (key: string) => {
         if (sortConfig.key !== key) return '↕';
@@ -519,6 +527,16 @@ export function FileList({
         );
     }
 
+    const handleHeal = async (file: metadata.FileMetadata) => {
+        if (file.healthStatus === 'Degraded') {
+            // Optimistic update (simulation)
+            // ideally we wait for healFile, but for UI responsiveness we can show 'Recovering' immediately if we managed state locally
+            // But since metadata.healFile sets it to 'Recovering' and saves, we just need to reload.
+            await metadata.healFile(file.id);
+            onFileChange?.();
+        }
+    };
+
     return (
         <div className="file-table-container">
             <table className="file-table">
@@ -537,8 +555,7 @@ export function FileList({
                         <th className="col-modified" onClick={() => handleSort('uploadedAt')}>
                             {activeSection === 'trash' ? 'Days Left' : 'Modified'} {getSortIcon('uploadedAt')}
                         </th>
-                        <th className="col-replica">Replicas</th>
-                        <th className="col-status">Status</th>
+                        <th className="col-health">Network Health</th>
                         <th className="col-actions"></th>
                     </tr>
                 </thead>
@@ -592,16 +609,16 @@ export function FileList({
                                     formatDate(file.uploadedAt)
                                 )}
                             </td>
-                            <td className="col-replica">
-                                <ReplicaStatus fileId={file.id} />
-                            </td>
-                            <td className="col-status">
-                                <div className="status-badges">
-                                    <span className="status-badge status-encrypted" title="Client-side encrypted">
-                                        <span className="badge-icon">🔒</span>
-                                        <span className="badge-text">Encrypted</span>
-                                    </span>
-                                </div>
+                            <td className="col-health">
+                                {file.mimeType !== 'application/folder' && !file.isTrashed && (
+                                    <ReplicaBadge
+                                        current={file.currentReplicas || 0}
+                                        target={file.targetReplicas || 3}
+                                        status={file.healthStatus || 'Degraded'}
+                                        lastHealed={file.lastHealed}
+                                        onHeal={() => handleHeal(file)}
+                                    />
+                                )}
                             </td>
                             <td className="col-actions">
                                 <div className="file-actions">

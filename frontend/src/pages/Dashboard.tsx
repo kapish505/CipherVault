@@ -13,12 +13,15 @@ import { useWallet } from '@/hooks/useWallet';
 import { useFolders } from '@/hooks/useFolders';
 import { FileUpload } from '@/components/dashboard/FileUpload';
 import { FileList } from '@/components/dashboard/FileList';
+import { Sidebar } from '@/components/dashboard/Sidebar'; // Added
 import { UploadManager } from '@/components/dashboard/UploadManager';
 import { AIAssistantPlaceholder } from '@/components/dashboard/AIAssistantPlaceholder';
 import { Breadcrumb } from '@/components/dashboard/Breadcrumb';
 import { Dialog } from '@/components/shared/Dialog';
 // import { syncFiles } from '@/services/sync'; // Disabled
 import * as metadata from '@/services/metadata';
+import * as cloudSync from '@/services/cloud_sync';
+import { isFirebaseConfigured } from '@/config/firebase';
 import { formatFileSize, formatDate } from '@/utils/format';
 import './Dashboard.css';
 
@@ -38,10 +41,27 @@ export function Dashboard() {
     } = useFolders(address);
     const [activeSection, setActiveSection] = useState<SidebarSection>('my-files');
     const [viewMode, setViewMode] = useState<ViewMode>('list');
+    const [currentFolder, setCurrentFolder] = useState<metadata.FileMetadata | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showUploadModal, setShowUploadModal] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    // const [isSyncing, setIsSyncing] = useState(false);
+    const {
+        nodeStatus,
+        setNodeStatus,
+        usedBytes,
+        setUsedBytes,
+        baseLimit,
+        earnedLimit,
+        totalLimit
+    } = useStorage(refreshTrigger);
+    // Sync State
+    const [syncStatus, setSyncStatus] = useState<cloudSync.SyncStatus>({
+        loading: false,
+        lastSynced: null,
+        error: null
+    });
+    const [showRestorePrompt, setShowRestorePrompt] = useState(false);
+
     const [selectedFile, setSelectedFile] = useState<metadata.FileMetadata | null>(null);
     const [showContextPanel, setShowContextPanel] = useState(false);
 
@@ -51,6 +71,9 @@ export function Dashboard() {
         title: string;
         description?: string;
         variant: 'prompt' | 'alert' | 'confirm';
+        placeholder?: string;
+        confirmLabel?: string;
+        cancelLabel?: string;
         onConfirm: (value?: string) => void;
     }>({
         title: '',
@@ -90,8 +113,91 @@ export function Dashboard() {
         if (isConnected && address) {
             // Check for expired trash items on load
             metadata.cleanupTrash(address).catch(console.error);
+
+            // Initial Sync Check
+            if (isFirebaseConfigured()) {
+                cloudSync.hasRemoteBackup(address).then(async (hasBackup) => {
+                    if (hasBackup) {
+                        const localFiles = await metadata.getFilesByWallet(address);
+                        if (localFiles.length === 0) {
+                            setShowRestorePrompt(true);
+                        }
+                    }
+                }).catch(err => console.error('Remote check failed', err));
+            }
         }
     }, [isConnected, address]);
+
+    // Auto-Save Effect (Debounced)
+    useEffect(() => {
+        if (!isConnected || !address || !isFirebaseConfigured()) return;
+
+        const saveTimeout = setTimeout(async () => {
+            setSyncStatus(prev => ({ ...prev, loading: true, error: null }));
+            try {
+                await cloudSync.saveEncryptedBackup(address);
+                setSyncStatus({ loading: false, lastSynced: Date.now(), error: null });
+            } catch (err) {
+                console.error('Auto-save failed', err);
+                setSyncStatus(prev => ({ ...prev, loading: false, error: 'Sync failed' }));
+            }
+        }, 2000); // 2s debounce
+
+        return () => clearTimeout(saveTimeout);
+    }, [refreshTrigger, address, isConnected]);
+
+    useEffect(() => {
+        const loadInitial = async () => {
+            if (address) {
+                // ... sync checks ...
+                // Calculate storage usage
+                try {
+                    const files = await metadata.getFilesByWallet(address);
+                    const totalSize = files.filter(f => !f.isTrashed).reduce((acc, f) => acc + f.size, 0);
+                    setUsedBytes(totalSize);
+                } catch (e) {
+                    console.error("Failed to calculate storage", e);
+                }
+            }
+        };
+        loadInitial();
+    }, [address, refreshTrigger]); // Added refreshTrigger to recalc on file changes
+
+    // Restore Prompt Handler
+    useEffect(() => {
+        if (showRestorePrompt && address) {
+            setDialogConfig({
+                title: 'Restore from Cloud?',
+                description: 'Found an encrypted backup in the cloud. Restore it now?',
+                variant: 'confirm',
+                confirmLabel: 'Restore Backup',
+                cancelLabel: 'Use Local Only',
+                onConfirm: async () => {
+                    setSyncStatus(prev => ({ ...prev, loading: true }));
+                    try {
+                        await cloudSync.restoreEncryptedBackup(address);
+                        setRefreshTrigger(p => p + 1);
+                        reloadFolders();
+                        setSyncStatus({ loading: false, lastSynced: Date.now(), error: null });
+                        setDialogOpen(false);
+                    } catch (err) {
+                        setDialogOpen(false);
+                        console.error(err);
+                        // Alert failure
+                        setDialogConfig({
+                            title: 'Restore Failed',
+                            description: 'Decryption failed. Ensure you are using the correct wallet.',
+                            variant: 'alert',
+                            onConfirm: () => setDialogOpen(false)
+                        });
+                        setTimeout(() => setDialogOpen(true), 100);
+                    }
+                }
+            });
+            setDialogOpen(true);
+            setShowRestorePrompt(false);
+        }
+    }, [showRestorePrompt, address]);
 
     // ... (handleBreadcrumbDrop)
 
@@ -100,7 +206,9 @@ export function Dashboard() {
             setDialogConfig({
                 title: 'Delete Forever?',
                 description: `Are you sure you want to permanently delete "${file.name}"? This action cannot be undone.`,
-                variant: 'confirm', // Use confirm variant for destructive actions
+                variant: 'confirm',
+                confirmLabel: 'Delete Forever',
+                cancelLabel: 'Cancel',
                 onConfirm: async () => {
                     await metadata.deleteFileMetadata(file.id);
                     setRefreshTrigger(p => p + 1);
@@ -114,13 +222,9 @@ export function Dashboard() {
             setDialogConfig({
                 title: 'Move to Trash?',
                 description: `"${file.name}" will be moved to Trash. Items in Trash are permanently deleted after 30 days.`,
-                variant: 'prompt', // Actually we want a simple confirm, reusing prompt/alert/confirm variant logic
-                // My Dialog component might support 'confirm' or I need to adapt.
-                // Let's check Dialog.tsx... it supports 'prompt', 'alert', 'confirm'? 
-                // Previous code usage implies 'prompt' has inputs. 
-                // Let's assume 'confirm' exists or use 'alert' with custom buttons if needed?
-                // Actually, let's use a standard Confirm approach.
-                // If Dialog helps, great. If not, I'll update Dialog too.
+                variant: 'confirm',
+                confirmLabel: 'Yes, Move to Trash',
+                cancelLabel: 'Cancel',
                 onConfirm: async () => {
                     await metadata.moveToTrash(file.id);
                     setRefreshTrigger(p => p + 1);
@@ -128,11 +232,6 @@ export function Dashboard() {
                     setDialogOpen(false);
                 }
             });
-            // Force variant to 'confirm' if my Dialog supports it, otherwise I might need to check Dialog implementation.
-            // Looking at previous Dialog usage, it seemed custom.
-            // Let's rely on my previous knowledge or check Dialog.tsx quickly if I can.
-            // I'll assume 'confirm' is valid or I'll fix it if it errors.
-            // Actually, the previous 'prompt' had an input. 'alert' has one button.
             setDialogOpen(true);
         }
     };
@@ -398,9 +497,33 @@ export function Dashboard() {
                     </div>
 
                     <div className="action-bar-right">
+                        {/* Sync Status Indicator */}
+                        {address && isFirebaseConfigured() && (
+                            <div className="sync-status text-xs text-gray-500 mr-4 flex items-center">
+                                {syncStatus.loading ? (
+                                    <span className="flex items-center gap-2">
+                                        <span className="animate-spin">↻</span> Syncing...
+                                    </span>
+                                ) : syncStatus.error ? (
+                                    <span className="text-red-400" title={syncStatus.error}>
+                                        ⚠ Sync Error
+                                    </span>
+                                ) : syncStatus.lastSynced ? (
+                                    <span className="text-green-500 flex items-center gap-1">
+                                        <span>✓</span> Synced
+                                    </span>
+                                ) : (
+                                    <span>Waiting...</span>
+                                )}
+                            </div>
+                        )}
+
                         <button
                             className="btn-sync"
-                            onClick={() => handleSync()}
+                            onClick={() => {
+                                setRefreshTrigger(p => p + 1);
+                                reloadFolders();
+                            }}
                             title="Refresh"
                         >
                             🔄
@@ -452,7 +575,22 @@ export function Dashboard() {
                         onFileChange={reloadFolders}
                         onDelete={handleDeleteFile}
                     />
-                </div>
+                    <Sidebar
+                        activeSection={activeSection}
+                        onSectionChange={setActiveSection}
+                        pinnedFolders={pinnedFolders}
+                        starredFiles={starredFiles}
+                        currentFolderId={currentFolderId}
+                        onFolderSelect={setCurrentFolderId}
+                        storageProps={{
+                            usedBytes,
+                            totalLimit,
+                            baseLimit,
+                            earnedLimit,
+                            nodeStatus,
+                            onToggleStatus: () => setNodeStatus(prev => prev === 'online' ? 'offline' : 'online')
+                        }}
+                    />    </div>
             </main>
 
             {/* Global Dialog */}

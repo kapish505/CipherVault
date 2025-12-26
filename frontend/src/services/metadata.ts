@@ -58,6 +58,11 @@ export interface FileMetadata {
     accessedAt?: number;
     path?: string[]; // Breadcrumb path IDs
     trashedAt?: number;
+    // Replica Health (Layer 1)
+    targetReplicas?: number;
+    currentReplicas?: number;
+    healthStatus?: 'Healthy' | 'Degraded' | 'Recovering';
+    lastHealed?: number;
 }
 
 /**
@@ -145,6 +150,29 @@ export async function getFilesByWallet(walletAddress: string): Promise<FileMetad
 
         request.onsuccess = () => {
             const files = request.result as FileMetadata[];
+
+            // Demo: Initialize replica state if missing
+            files.forEach(f => {
+                if (f.targetReplicas === undefined) {
+                    f.targetReplicas = 3;
+                    // Randomize current for demo variety: 3 (60%), 2 (30%), 1 (10%)
+                    const rand = Math.random();
+                    if (rand > 0.4) f.currentReplicas = 3;
+                    else if (rand > 0.1) f.currentReplicas = 2;
+                    else f.currentReplicas = 1;
+
+                    f.healthStatus = f.currentReplicas === 3 ? 'Healthy' : 'Degraded';
+                    // We don't await save here to avoid mass writes on read, 
+                    // but in a real app this would be in DB. 
+                    // For now, let's just mutate the object returned. 
+                    // Ideally we should persist this initialization.
+                    // Let's persist it async to keep UI fast.
+                    if (f.mimeType !== 'application/folder') {
+                        saveFileMetadata(f).catch(console.error);
+                    }
+                }
+            });
+
             // Sort by upload date (newest first)
             files.sort((a, b) => b.uploadedAt - a.uploadedAt);
             resolve(files);
@@ -342,5 +370,86 @@ export async function clearWalletFiles(walletAddress: string): Promise<void> {
                 reject(new Error('Failed to clear files'));
             };
         });
+    });
+}
+
+/**
+ * Export all metadata as JSON string (for backup/sync)
+ */
+export async function exportDatabase(walletAddress: string): Promise<string> {
+    const files = await getFilesByWallet(walletAddress);
+
+    // Folders are included in getFilesByWallet as they are stored in the same object store
+
+    const exportData = {
+        version: 1,
+        timestamp: Date.now(),
+        walletAddress,
+        items: files
+    };
+
+    return JSON.stringify(exportData);
+}
+
+/**
+ * Import metadata from JSON string (merge strategy)
+ */
+export async function importDatabase(json: string, walletAddress: string): Promise<void> {
+    try {
+        const data = JSON.parse(json);
+
+        // Basic validation
+        if (!data.items || !Array.isArray(data.items)) {
+            throw new Error('Invalid backup format');
+        }
+
+        for (const item of data.items) {
+            // Ensure it belongs to this wallet (security check)
+            if (item.walletAddress.toLowerCase() !== walletAddress.toLowerCase()) {
+                continue;
+            }
+            await saveFileMetadata(item);
+        }
+
+    } catch (error) {
+        console.error('Import failed:', error);
+        throw error;
+    }
+}
+
+/**
+ * Heal a file (Simulation)
+ */
+export async function healFile(id: string): Promise<void> {
+    const file = await getFileById(id);
+    if (!file) return;
+
+    // 1. Set status to Recovering
+    file.healthStatus = 'Recovering';
+    await saveFileMetadata(file);
+
+    // 2. Simulate delay (2 seconds)
+    return new Promise((resolve) => {
+        setTimeout(async () => {
+            // Re-fetch to ensure no concurrent updates
+            const freshFile = await getFileById(id);
+            if (freshFile) {
+                // Increment replicas
+                freshFile.currentReplicas = (freshFile.currentReplicas || 0) + 1;
+                freshFile.lastHealed = Date.now();
+
+                // Update status
+                const target = freshFile.targetReplicas || 3;
+                if (freshFile.currentReplicas >= target) {
+                    freshFile.currentReplicas = target; // Cap it
+                    freshFile.healthStatus = 'Healthy';
+                } else {
+                    freshFile.healthStatus = 'Degraded';
+                }
+
+                await saveFileMetadata(freshFile);
+            }
+            resolve();
+        }, 2000);
     });
 }
